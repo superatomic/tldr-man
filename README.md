@@ -22,6 +22,14 @@ Features:
 
 ## Installation
 
+### With Homebrew
+
+Install `tldr-man-client` with [Homebrew](https://brew.sh):
+
+```shell
+brew install superatomic/tap/tldr-man
+```
+
 ### With Pip
 
 Install `tldr-man-client` with pip (version 3.10+):
