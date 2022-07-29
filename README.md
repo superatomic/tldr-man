@@ -63,7 +63,7 @@ tldr --update
 tldr --render path/to/page.md
 ```
 
-**Print tldr manpage paths as a colon-separated list (see the [Manpage Integration](#Manpage-Integration) section):**
+**Print tldr manpage paths as a colon-separated list (see the [Manpage Integration](#manpage-integration) section):**
 
 ```shell
 tldr --manpath
