@@ -24,7 +24,7 @@ or visit the project repository at https://github.com/superatomic/tldr-man-clien
 """
 
 from importlib import metadata
-__version__ = metadata.version('tldr')
+__version__ = metadata.version('tldr-man')
 __author__ = "Ethan Kinnear <contact@superatomic.dev>"
 
 import sys
