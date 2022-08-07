@@ -195,7 +195,7 @@ def render_manpage(tldr_page: str) -> Optional[str]:
         if not line:
             continue
 
-        indicator, contents = line[0], line[1:].strip().replace(r'\\', r'\e')
+        indicator, contents = line[0], line[1:].strip().replace(r'\\', r'\e').replace('*', r'\*')
         match indicator:
             case '-':
                 examples.append(f'\n**{contents}**\n')
