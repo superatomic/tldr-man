@@ -15,12 +15,12 @@
 """Handle tldr-page languages."""
 
 from os import getenv
-from typing import Iterable
+from collections.abc import Iterator
 
 from tldr_man.pages import TLDR_CACHE_HOME
 
 
-def all_languages():
+def all_languages() -> Iterator[str]:
     return (
         get_language_directory(pages_dir.name.removeprefix('pages').lstrip('.') or 'en')
         for pages_dir in TLDR_CACHE_HOME.iterdir()
@@ -28,7 +28,7 @@ def all_languages():
     )
 
 
-def get_languages() -> Iterable[str]:
+def get_languages() -> Iterator[str]:
     """
     Returns a list of the user's preferred languages, inferred by the environment variables LANG and LANGUAGE.
 
