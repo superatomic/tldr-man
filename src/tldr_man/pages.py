@@ -14,11 +14,11 @@
 
 """Interact with tldr-pages and the tldr-pages manpage cache."""
 
-import os
 import re
 import zipfile
 from contextlib import suppress
 from pathlib import Path
+from os import remove, makedirs
 from shutil import rmtree, move
 from subprocess import run, PIPE, DEVNULL
 from typing import Optional, Iterable
@@ -156,7 +156,7 @@ def update_cache() -> None:
         with suppress(FileNotFoundError):
             rmtree(TLDR_CACHE_HOME)
 
-        os.makedirs(TLDR_CACHE_HOME.parent, exist_ok=True)
+        makedirs(TLDR_CACHE_HOME.parent, exist_ok=True)
 
         move(tldr_temp_dir, TLDR_CACHE_HOME)
     finally:
@@ -164,7 +164,7 @@ def update_cache() -> None:
 
         with suppress(NameError, FileNotFoundError):
             # noinspection PyUnboundLocalVariable
-            os.remove(tldr_zip_archive)
+            remove(tldr_zip_archive)
         with suppress(NameError, FileNotFoundError):
             # noinspection PyUnboundLocalVariable
             rmtree(tldr_temp_dir)
