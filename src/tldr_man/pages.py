@@ -21,7 +21,8 @@ from pathlib import Path
 from os import remove, makedirs
 from shutil import rmtree, move
 from subprocess import run, PIPE, DEVNULL
-from typing import Optional, Iterable
+from typing import Optional
+from collections.abc import Iterable
 
 import requests
 from click import secho, progressbar, style
