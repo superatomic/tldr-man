@@ -35,19 +35,19 @@ TLDR_ZIP_ARCHIVE_URL = "https://tldr.sh/assets/tldr.zip"
 
 TLDR_MANPAGE_SECTION = '1'
 
-MANPAGE_HEADER = """
-% {name}(1) {name}
+MANPAGE_HEADER = f"""
+% {{name}}({TLDR_MANPAGE_SECTION}) {{name}}
 %
 % tldr-man-client
 
 # NAME
-{name} - {desc}
+{{name}} - {{desc}}
 
 # DESCRIPTION
-{info}
+{{info}}
 
 # EXAMPLES
-{examples}
+{{examples}}
 
 """[1:-1]
 
