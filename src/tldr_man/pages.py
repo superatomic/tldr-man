@@ -60,7 +60,7 @@ Make sure that pandoc is installed and on your PATH.
 MANPAGE_MISSING_MESSAGE = """
 Error: Couldn't find the `man` command.
 Make sure that `man` is on your PATH.
-"""
+"""[1:-1]
 
 PAGE_NOT_FOUND_MESSAGE = """
 Error: Page `{page_name}` is not found.
