@@ -208,7 +208,7 @@ def render_manpage(tldr_page: str) -> str:
 
     try:
         return run(['pandoc', '-', '-s', '-t', 'man', '-f', 'markdown-tex_math_dollars-smart'],
-                   input=res.encode('utf-8'), stdout=PIPE).stdout.decode('utf-8')
+                   input=res, stdout=PIPE, encoding="utf-8").stdout
     except FileNotFoundError:
         esecho(PANDOC_MISSING_MESSAGE, exitcode=127)
 
