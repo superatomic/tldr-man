@@ -97,7 +97,7 @@ def subcommand_render(_ctx, _param, value: str):
 
 
 @click_standalone_subcommand
-def subcommand_list(ctx, _param, _value: None):
+def subcommand_list(ctx, _param, _value):
     pages.verify_tldr_cache_exists()
 
     locales = get_locales(ctx)
@@ -112,7 +112,7 @@ def subcommand_list(ctx, _param, _value: None):
 
 
 @click_standalone_subcommand
-def subcommand_manpath(ctx, _param, _value: None):
+def subcommand_manpath(ctx, _param, _value):
     pages.verify_tldr_cache_exists()
 
     locales = get_locales(ctx)
@@ -122,7 +122,7 @@ def subcommand_manpath(ctx, _param, _value: None):
 
 
 @click_standalone_subcommand
-def subcommand_version(_ctx, _param, _value: str):
+def subcommand_version(_ctx, _param, _value):
     secho(f'{TLDR_COMMAND_NAME} {__version__}')
 
 
