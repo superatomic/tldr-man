@@ -172,7 +172,7 @@ def update_cache() -> None:
     secho('Done!', fg='green', bold=True)
 
 
-def render_manpage(tldr_page: str) -> Optional[str]:
+def render_manpage(tldr_page: str) -> str:
     """
     Render a manpage from a markdown formatted tldr-page.
 
