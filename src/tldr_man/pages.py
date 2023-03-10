@@ -149,7 +149,7 @@ def update_cache() -> None:
 
                         # Render and save a manpage from the tldr-page.
                         manpage = render_manpage(page.read_text())
-                        res_file = res_dir / (page.name.removesuffix('.md') + '.1')
+                        res_file = res_dir / (page.name.removesuffix('.md') + '.' + TLDR_MANPAGE_SECTION)
                         res_file.write_text(manpage)
 
         # Now that the updated cache has been generated, remove the old cache, make sure the parent directory exists,
@@ -240,7 +240,7 @@ def display_page(page: Path) -> None:
 
 def find_page(page_name: str, /, locales: Iterable[str], page_sections: Iterable[str]) -> Optional[Path]:
     for search_dir in get_dir_search_order(locales, page_sections):
-        page = search_dir / (page_name + '.1')
+        page = search_dir / (page_name + '.' + TLDR_MANPAGE_SECTION)
 
         if page.exists():
             return page
