@@ -17,12 +17,15 @@
 from sys import exit
 from pathlib import Path
 from tempfile import mkstemp, mkdtemp
-from typing import Optional
+from typing import TypeVar, NoReturn
+from collections.abc import Iterable, Iterator
 
 from click import secho
 
 
-def unique(items):
+T = TypeVar('T')
+
+def unique(items: Iterable[T]) -> Iterator[T]:
     seen = set()
     for item in items:
         if item not in seen:
@@ -38,7 +41,10 @@ def mkdtemp_path(*args, **kwargs) -> Path:
     return Path(mkdtemp(*args, **kwargs))
 
 
-def esecho(*args, exitcode: Optional[int] = None, **kwargs):
-    secho(*args, **kwargs, fg='red', err=True)
-    if exitcode is not None:
-        exit(exitcode)
+def eprint(message: str):
+    secho(message, fg='red', err=True)
+
+
+def exit_with(message: str, exitcode: int = 1) -> NoReturn:
+    eprint(message)
+    exit(exitcode)
