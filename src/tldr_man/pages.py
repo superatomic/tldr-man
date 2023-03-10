@@ -28,7 +28,7 @@ import requests
 from click import secho, progressbar, style
 from xdg import XDG_CACHE_HOME
 
-from tldr_man.util import mkstemp_path, mkdtemp_path, esecho
+from tldr_man.util import mkstemp_path, mkdtemp_path, eprint, exit_with
 
 TLDR_CACHE_DIR_NAME = 'tldr-man'
 
@@ -90,11 +90,11 @@ def download_tldr_zip_archive(location: Path, url: str = TLDR_ZIP_ARCHIVE_URL) -
     try:
         r = requests.get(url, timeout=10)
     except requests.exceptions.ConnectionError:
-        esecho(f"Error: Could not make connection to {TLDR_ZIP_ARCHIVE_URL}", exitcode=1)
+        exit_with(f"Error: Could not make connection to {TLDR_ZIP_ARCHIVE_URL}")
     except requests.exceptions.Timeout:
-        esecho(f"Error: Request to {TLDR_ZIP_ARCHIVE_URL} timed out", exitcode=1)
+        exit_with(f"Error: Request to {TLDR_ZIP_ARCHIVE_URL} timed out")
     except requests.exceptions.RequestException:
-        esecho(f"The following error occurred when trying to access {TLDR_ZIP_ARCHIVE_URL}")
+        eprint(f"The following error occurred when trying to access {TLDR_ZIP_ARCHIVE_URL}")
         raise
     else:
         location.write_bytes(r.content)
@@ -104,7 +104,7 @@ def update_cache() -> None:
     """Updates the tldr-pages manpage cache."""
 
     if not pandoc_exists():
-        esecho(PANDOC_MISSING_MESSAGE, exitcode=127)
+        exit_with(PANDOC_MISSING_MESSAGE, exitcode=127)
 
     secho('Updating tldr-pages cache...', fg='cyan')
 
@@ -120,7 +120,7 @@ def update_cache() -> None:
         try:
             tldr_zip_path = zipfile.Path(tldr_zip_archive)
         except zipfile.BadZipFile:
-            esecho(f"Error: Got a bad zipfile from {TLDR_ZIP_ARCHIVE_URL}")
+            eprint(f"Error: Got a bad zipfile from {TLDR_ZIP_ARCHIVE_URL}")
             raise
 
         # Iterate through each language and section in the zip file.
@@ -210,7 +210,7 @@ def render_manpage(tldr_page: str) -> str:
         return run(['pandoc', '-', '-s', '-t', 'man', '-f', 'markdown-tex_math_dollars-smart'],
                    input=res, stdout=PIPE, encoding="utf-8").stdout
     except FileNotFoundError:
-        esecho(PANDOC_MISSING_MESSAGE, exitcode=127)
+        exit_with(PANDOC_MISSING_MESSAGE, exitcode=127)
 
 
 def pandoc_exists() -> bool:
@@ -224,7 +224,7 @@ def pandoc_exists() -> bool:
 def verify_tldr_cache_exists():
     """Display a specific message if the tldr manpage cache doesn't exist yet, and then exit."""
     if not TLDR_CACHE_HOME.exists():
-        esecho(CACHE_DOES_NOT_EXIST_MESSAGE, exitcode=1)
+        exit_with(CACHE_DOES_NOT_EXIST_MESSAGE)
 
 
 def display_page(page: Path) -> None:
@@ -232,7 +232,7 @@ def display_page(page: Path) -> None:
         run(['man', page])
     except FileNotFoundError as err:
         if err.filename == 'man':
-            esecho(MANPAGE_MISSING_MESSAGE, exitcode=127)
+            exit_with(MANPAGE_MISSING_MESSAGE, exitcode=127)
         else:
             raise
 
@@ -244,7 +244,7 @@ def find_page(page_name: str, /, locales: Iterable[str], page_sections: Iterable
         if page.exists():
             return page
     else:
-        esecho(PAGE_NOT_FOUND_MESSAGE.format(page_name=page_name))
+        eprint(PAGE_NOT_FOUND_MESSAGE.format(page_name=page_name))
 
 
 def get_dir_search_order(locales: Iterable[str], page_sections: Iterable[str]) -> Iterable[Path]:
