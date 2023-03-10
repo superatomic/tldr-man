@@ -149,7 +149,8 @@ def update_cache() -> None:
 
                         # Render and save a manpage from the tldr-page.
                         manpage = render_manpage(page.read_text())
-                        (res_dir / (page.name.removesuffix('.md') + '.1')).write_text(manpage)
+                        res_file = res_dir / (page.name.removesuffix('.md') + '.1')
+                        res_file.write_text(manpage)
 
         # Now that the updated cache has been generated, remove the old cache, make sure the parent directory exists,
         # and move the new cache into the correct directory from the temporary directory.
