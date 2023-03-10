@@ -16,6 +16,7 @@
 
 import re
 import zipfile
+from concurrent.futures import ThreadPoolExecutor
 from contextlib import suppress
 from pathlib import Path
 from os import remove, makedirs
@@ -138,19 +139,40 @@ def update_cache() -> None:
                                      + ' / '
                                      + style(f'{sections_dir.name:7s}', fg='blue'))
 
-                # Loop through each tldr-page in the current language and section (displaying a progressbar) and
-                # generate a manpage for each markdown formatted tldr-page.
-                with progressbar(list(sections_dir.iterdir()), label=progressbar_label) as pages:
-                    for page in pages:
-                        page: zipfile.Path
+                # `render_manpage()` takes a significant amount of time to run.
+                # Due to the number of pages that need to be rendered,
+                # this function is invoked simultaneously using threads.
+                def to_manpage(tldr_page: zipfile.Path) -> (str, str):
+                    """Convert a tldr-page into a manpage"""
+                    rendered_manpage = render_manpage(tldr_page.read_text())
+                    manpage_filename = tldr_page.name.removesuffix('.md') + '.' + TLDR_MANPAGE_SECTION
+                    # Return the filename to save the manpage to along with the rendered manpage itself.
+                    return manpage_filename, rendered_manpage
 
-                        if not page.is_file():
-                            continue
+                # Get a list of all tldr-pages in the current language and section.
+                # The generator needs to be collected into a list to give the progressbar a length.
+                pages = list(filter(lambda p: p.is_file(), sections_dir.iterdir()))
 
-                        # Render and save a manpage from the tldr-page.
-                        manpage = render_manpage(page.read_text())
-                        res_file = res_dir / (page.name.removesuffix('.md') + '.' + TLDR_MANPAGE_SECTION)
-                        res_file.write_text(manpage)
+                # Create a thread pool to render multiple manpages in parallel, and display progress with a progressbar.
+                # The default number of workers is used ((os.cpu_count() or 1) + 4).
+                with (ThreadPoolExecutor(thread_name_prefix='render_manpage') as pool,
+                      progressbar(pool.map(to_manpage, pages), label=progressbar_label, length=len(pages)) as fut):
+                    try:
+                        # As each manpage finishes rendering, save their contents to the destination file.
+                        # Note: This operation must be done here and not within a thread! `Path.write_text` and
+                        #       `shutil.rmtree` (called as part of cleanup) are not thread-safe if they happen at the
+                        #       same time. (This would occur during a keyboard interrupt)
+                        for filename, manpage in fut:
+                            res_file = res_dir / filename
+                            res_file.write_text(manpage)
+                    except:
+                        # If an exceptiom occurs, such as a KeyboardInterrupt or an actual Exception,
+                        # shutdown the pool *without* waiting for any remaining futures to finish. This will prevent the
+                        # program from having a significant delay when it exits prematurely.
+                        # This is not a `finally` clause because the normal `pool.shutdown` behavior implemented by
+                        # `Executor.__exit__` is correct when no error occurs.
+                        pool.shutdown(wait=False, cancel_futures=True)
+                        raise
 
         # Now that the updated cache has been generated, remove the old cache, make sure the parent directory exists,
         # and move the new cache into the correct directory from the temporary directory.
