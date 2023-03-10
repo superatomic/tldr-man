@@ -82,8 +82,8 @@ def subcommand_update(_ctx, _param, _value):
 
 
 @click_standalone_subcommand
-def subcommand_render(_ctx, _param, value: str):
-    page_to_render = Path(value).read_text()
+def subcommand_render(_ctx, _param, value: Path):
+    page_to_render = value.read_text()
     rendered_page = pages.render_manpage(page_to_render)
 
     try:
@@ -128,19 +128,35 @@ def subcommand_version(_ctx, _param, _value):
 
 @click.command(cls=HelpColorsCommand, help_headers_color='yellow', help_options_color='green')
 @click.argument('page', nargs=-1, required=True)
-@click.option('-p', '--platform', type=click.Choice(TLDR_PLATFORMS), is_eager=True,
+@click.option('-p', '--platform',
+              type=click.Choice(TLDR_PLATFORMS),
+              is_eager=True,
               help='Override the preferred platform')
-@click.option('-L', '--language', is_eager=True,
+@click.option('-L', '--language',
+              is_eager=True,
               help='Specify a preferred language')
-@click.option('-u', '--update', is_flag=True, callback=subcommand_update, expose_value=False, is_eager=True,
+@click.option('-u', '--update',
+              callback=subcommand_update, expose_value=False,
+              is_flag=True,
+              is_eager=True,
               help='Update the tldr-pages cache')
-@click.option('-r', '--render', nargs=1, callback=subcommand_render, expose_value=False, is_eager=True,
+@click.option('-r', '--render',
+              callback=subcommand_render, expose_value=False,
+              type=click.Path(exists=True, dir_okay=False, path_type=Path), nargs=1,
+              is_eager=True,
               help='Render a page locally')
-@click.option('-l', '--list', is_flag=True, callback=subcommand_list, expose_value=False,
+@click.option('-l', '--list',
+              callback=subcommand_list, expose_value=False,
+              is_flag=True,
               help='List all the pages for the current platform')
-@click.option('--manpath', is_flag=True, callback=subcommand_manpath, expose_value=False,
+@click.option('--manpath',
+              callback=subcommand_manpath, expose_value=False,
+              is_flag=True,
               help='Print the paths to the tldr manpages')
-@click.option('-v', '-V', '--version', is_flag=True, callback=subcommand_version, expose_value=False, is_eager=True,
+@click.option('-v', '-V', '--version',
+              callback=subcommand_version, expose_value=False,
+              is_flag=True,
+              is_eager=True,
               help='Display the version of the client')
 @click.help_option('-h', '--help')
 @click.pass_context
