@@ -187,7 +187,7 @@ def render_manpage(tldr_page: str) -> str:
 
     # Get the information of the command.
     info = []
-    while (valid_line := (line := lines.pop(0)).startswith('> ')) or not info:
+    while lines and ((valid_line := (line := lines.pop(0)).startswith('> ')) or not info):
         if not valid_line:
             continue
         info.append(line.removeprefix('> '))
