@@ -35,7 +35,6 @@ from functools import wraps
 from typing import Optional
 
 import click
-from click import secho
 from click_help_colors import HelpColorsCommand
 
 from tldr_man import languages, pages
@@ -123,7 +122,7 @@ def subcommand_manpath(ctx, _param, _value):
 
 @click_standalone_subcommand
 def subcommand_version(_ctx, _param, _value):
-    secho(f'{TLDR_COMMAND_NAME} {__version__}')
+    print(TLDR_COMMAND_NAME, __version__)
 
 
 @click.command(cls=HelpColorsCommand, help_headers_color='yellow', help_options_color='green')
