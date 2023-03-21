@@ -31,7 +31,7 @@ include = ["generate_completions.sh"]
 "Say Thanks!" = "https://saythanks.io/to/superatomic"
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = "^3.10.4"
 click = "^8.1.3"
 click-help-colors = "^0.9.1"
 xdg = "^5.1.1"
