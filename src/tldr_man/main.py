@@ -35,6 +35,7 @@ from functools import wraps
 from typing import Optional
 
 import click
+from click import Context
 from click_help_colors import HelpColorsCommand
 
 from tldr_man import languages, pages
@@ -175,7 +176,7 @@ def cli(ctx, page: list[str], **_):
         pages.display_page(page)
 
 
-def get_locales(ctx) -> list[str]:
+def get_locales(ctx: Context) -> list[str]:
     language = ctx.params.get('language')
     if language is not None:
         page_locale = languages.get_language_directory(language)
@@ -187,7 +188,7 @@ def get_locales(ctx) -> list[str]:
         return list(languages.get_languages())
 
 
-def get_page_sections(ctx) -> list[str]:
+def get_page_sections(ctx: Context) -> list[str]:
     page_sections = ['common']
 
     current_platform = get_current_platform()
