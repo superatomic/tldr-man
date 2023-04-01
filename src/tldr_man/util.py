@@ -18,12 +18,12 @@ from sys import exit
 from pathlib import Path
 from tempfile import mkstemp, mkdtemp
 from typing import TypeVar, NoReturn
-from collections.abc import Iterable, Iterator
+from collections.abc import Iterable, Iterator, Hashable
 
 from click import secho
 
 
-T = TypeVar('T')
+T = TypeVar('T', bound=Hashable)
 
 def unique(items: Iterable[T]) -> Iterator[T]:
     seen = set()
