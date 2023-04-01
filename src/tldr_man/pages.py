@@ -166,7 +166,7 @@ def update_cache() -> None:
                             res_file = res_dir / filename
                             res_file.write_text(manpage)
                     except:
-                        # If an exceptiom occurs, such as a KeyboardInterrupt or an actual Exception,
+                        # If an exception occurs, such as a KeyboardInterrupt or an actual Exception,
                         # shutdown the pool *without* waiting for any remaining futures to finish. This will prevent the
                         # program from having a significant delay when it exits prematurely.
                         # This is not a `finally` clause because the normal `pool.shutdown` behavior implemented by
