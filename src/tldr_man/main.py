@@ -47,7 +47,7 @@ TLDR_COMMAND_NAME = 'tldr'
 TLDR_PLATFORMS = 'android linux macos osx sunos windows'.split()
 
 
-def click_standalone_subcommand(func):
+def standalone_subcommand(func):
     """Function decorator to reduce boilerplate code at the start and end of all subcommand callback functions."""
     @wraps(func)
     def wrapper(ctx, _param, value):
@@ -93,12 +93,12 @@ def require_tldr_cache(func):
 
     return wrapper
 
-@click_standalone_subcommand
+@standalone_subcommand
 def subcommand_update(_ctx):
     pages.update_cache()
 
 
-@click_standalone_subcommand
+@standalone_subcommand
 def subcommand_render(_ctx, value: Path):
     page_to_render = value.read_text()
     rendered_page = pages.render_manpage(page_to_render)
@@ -113,7 +113,7 @@ def subcommand_render(_ctx, value: Path):
             remove(path)
 
 
-@click_standalone_subcommand
+@standalone_subcommand
 @require_tldr_cache
 def subcommand_list(locales, page_sections):
     print('\n'.join(unique(
@@ -124,13 +124,13 @@ def subcommand_list(locales, page_sections):
     )))
 
 
-@click_standalone_subcommand
+@standalone_subcommand
 @require_tldr_cache
 def subcommand_manpath(locales, page_sections):
     print(':'.join(unique(str(x.parent) for x in pages.get_dir_search_order(locales, page_sections))))
 
 
-@click_standalone_subcommand
+@standalone_subcommand
 def subcommand_version(_ctx):
     print(TLDR_COMMAND_NAME, __version__)
 
