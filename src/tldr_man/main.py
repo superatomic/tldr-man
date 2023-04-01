@@ -50,7 +50,7 @@ TLDR_PLATFORMS = 'android linux macos osx sunos windows'.split()
 def standalone_subcommand(func):
     """Function decorator to reduce boilerplate code at the start and end of all subcommand callback functions."""
     @wraps(func)
-    def wrapper(ctx, _param, value):
+    def wrapper(ctx: Context, _param, value):
         if not value or ctx.resilient_parsing:
             return
 
