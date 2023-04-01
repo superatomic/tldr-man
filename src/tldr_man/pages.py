@@ -90,12 +90,12 @@ def download_tldr_zip_archive(location: Path, url: str = TLDR_ZIP_ARCHIVE_URL) -
 
     try:
         r = requests.get(url, timeout=10)
-    except requests.exceptions.ConnectionError:
-        exit_with(f"Error: Could not make connection to {TLDR_ZIP_ARCHIVE_URL}")
-    except requests.exceptions.Timeout:
-        exit_with(f"Error: Request to {TLDR_ZIP_ARCHIVE_URL} timed out")
-    except requests.exceptions.RequestException:
-        eprint(f"The following error occurred when trying to access {TLDR_ZIP_ARCHIVE_URL}")
+    except requests.ConnectionError:
+        exit_with(f"Error: Could not make connection to {url}")
+    except requests.Timeout:
+        exit_with(f"Error: Request to {url} timed out")
+    except requests.RequestException:
+        eprint(f"The following error occurred when trying to access {url}:")
         raise
     else:
         location.write_bytes(r.content)
@@ -166,7 +166,7 @@ def update_cache() -> None:
                             res_file = res_dir / filename
                             res_file.write_text(manpage)
                     except:
-                        # If an exceptiom occurs, such as a KeyboardInterrupt or an actual Exception,
+                        # If an exception occurs, such as a KeyboardInterrupt or an actual Exception,
                         # shutdown the pool *without* waiting for any remaining futures to finish. This will prevent the
                         # program from having a significant delay when it exits prematurely.
                         # This is not a `finally` clause because the normal `pool.shutdown` behavior implemented by
