@@ -50,14 +50,14 @@ TLDR_PLATFORMS = 'android linux macos osx sunos windows'.split()
 def click_standalone_subcommand(func):
     """Function decorator to reduce boilerplate code at the start and end of all subcommand callback functions."""
     @wraps(func)
-    def wrapper(ctx, param, value):
+    def wrapper(ctx, _param, value):
         if not value or ctx.resilient_parsing:
             return
 
         exited_with_error = False
         # noinspection PyBroadException
         try:
-            func(ctx, param, value)
+            return func(ctx, value) if value is not True else func(ctx)
         except Exception:
             from traceback import format_exc
             from sys import stderr
@@ -75,14 +75,31 @@ def click_standalone_subcommand(func):
 
     return wrapper
 
+def require_tldr_cache(func):
+    """
+    Function decorator to mark that a subcommand requires the tldr-page cache to exist.
+    Additionally, maps `ctx` into the valid locales and platforms.
+
+    func(locales, platforms, ...) --> func(ctx, ...)
+    """
+    @wraps(func)
+    def wrapper(ctx: Context, *args, **kwargs):
+        pages.verify_tldr_cache_exists()
+
+        locales: list[str] = get_locales(ctx)
+        page_sections: list[str] = get_page_sections(ctx)
+
+        return func(locales, page_sections, *args, **kwargs)
+
+    return wrapper
 
 @click_standalone_subcommand
-def subcommand_update(_ctx, _param, _value):
+def subcommand_update(_ctx):
     pages.update_cache()
 
 
 @click_standalone_subcommand
-def subcommand_render(_ctx, _param, value: Path):
+def subcommand_render(_ctx, value: Path):
     page_to_render = value.read_text()
     rendered_page = pages.render_manpage(page_to_render)
 
@@ -97,12 +114,8 @@ def subcommand_render(_ctx, _param, value: Path):
 
 
 @click_standalone_subcommand
-def subcommand_list(ctx, _param, _value):
-    pages.verify_tldr_cache_exists()
-
-    locales = get_locales(ctx)
-    page_sections = get_page_sections(ctx)
-
+@require_tldr_cache
+def subcommand_list(locales, page_sections):
     print('\n'.join(unique(
         page.stem
         for section in pages.get_dir_search_order(locales, page_sections)
@@ -112,17 +125,13 @@ def subcommand_list(ctx, _param, _value):
 
 
 @click_standalone_subcommand
-def subcommand_manpath(ctx, _param, _value):
-    pages.verify_tldr_cache_exists()
-
-    locales = get_locales(ctx)
-    page_sections = get_page_sections(ctx)
-
+@require_tldr_cache
+def subcommand_manpath(locales, page_sections):
     print(':'.join(unique(str(x.parent) for x in pages.get_dir_search_order(locales, page_sections))))
 
 
 @click_standalone_subcommand
-def subcommand_version(_ctx, _param, _value):
+def subcommand_version(_ctx):
     print(TLDR_COMMAND_NAME, __version__)
 
 
@@ -160,14 +169,9 @@ def subcommand_version(_ctx, _param, _value):
               help='Display the version of the client')
 @click.help_option('-h', '--help')
 @click.pass_context
-def cli(ctx, page: list[str], **_):
+@require_tldr_cache
+def cli(locales, page_sections, page: list[str], **_):
     """TLDR client that displays tldr-pages as manpages"""
-
-    pages.verify_tldr_cache_exists()
-
-    locales = get_locales(ctx)
-    page_sections = get_page_sections(ctx)
-
     page_name = '-'.join(page).strip().lower()
 
     page = pages.find_page(page_name, locales, page_sections)
