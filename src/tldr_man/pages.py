@@ -90,12 +90,12 @@ def download_tldr_zip_archive(location: Path, url: str = TLDR_ZIP_ARCHIVE_URL) -
 
     try:
         r = requests.get(url, timeout=10)
-    except requests.exceptions.ConnectionError:
-        exit_with(f"Error: Could not make connection to {TLDR_ZIP_ARCHIVE_URL}")
-    except requests.exceptions.Timeout:
-        exit_with(f"Error: Request to {TLDR_ZIP_ARCHIVE_URL} timed out")
-    except requests.exceptions.RequestException:
-        eprint(f"The following error occurred when trying to access {TLDR_ZIP_ARCHIVE_URL}")
+    except requests.ConnectionError:
+        exit_with(f"Error: Could not make connection to {url}")
+    except requests.Timeout:
+        exit_with(f"Error: Request to {url} timed out")
+    except requests.RequestException:
+        eprint(f"The following error occurred when trying to access {url}:")
         raise
     else:
         location.write_bytes(r.content)
