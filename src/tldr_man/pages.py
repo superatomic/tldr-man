@@ -276,3 +276,7 @@ def get_dir_search_order(locales: Iterable[str], page_sections: Iterable[str]) -
         for locale in locales
         for section in page_sections
     )
+
+
+def language_directory_to_code(language_dir: Path):
+    return language_dir.name.removeprefix('pages').lstrip('.') or 'en'

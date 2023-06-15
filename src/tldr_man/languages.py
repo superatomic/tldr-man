@@ -17,7 +17,7 @@
 from os import getenv
 from collections.abc import Iterator
 
-from tldr_man.pages import TLDR_CACHE_HOME
+from tldr_man.pages import TLDR_CACHE_HOME, language_directory_to_code
 
 
 def all_languages() -> Iterator[str]:
@@ -26,7 +26,7 @@ def all_languages() -> Iterator[str]:
 
 def all_language_codes() -> Iterator[str]:
     return (
-        pages_dir.name.removeprefix('pages').lstrip('.') or 'en'
+        language_directory_to_code(pages_dir)
         for pages_dir in TLDR_CACHE_HOME.iterdir()
         if pages_dir.is_dir()
     )
