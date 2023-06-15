@@ -28,7 +28,7 @@ def all_languages() -> Iterator[str]:
     )
 
 
-def get_languages() -> Iterator[str]:
+def get_environment_languages() -> Iterator[str]:
     """
     Returns a list of the user's preferred languages, inferred by the environment variables LANG and LANGUAGE.
 

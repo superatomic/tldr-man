@@ -189,7 +189,7 @@ def get_locales(ctx: Context) -> list[str]:
         else:
             return [page_locale]
     else:
-        return list(languages.get_languages())
+        return list(languages.get_environment_languages())
 
 
 def get_page_sections(ctx: Context) -> list[str]:
