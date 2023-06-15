@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Handle tldr-page languages."""
+"""Handle languages for the client."""
 
 from os import getenv
 from collections.abc import Iterator
@@ -24,10 +24,12 @@ from tldr_man.util import exit_with
 
 
 def all_languages() -> Iterator[str]:
+    """Returns an iterator of all languages directory names."""
     return map(get_language_directory, all_language_codes())
 
 
 def all_language_codes() -> Iterator[str]:
+    """Returns an iterator of all language codes, based on all language directories."""
     return (
         language_directory_to_code(pages_dir)
         for pages_dir in TLDR_CACHE_HOME.iterdir()
@@ -37,9 +39,10 @@ def all_language_codes() -> Iterator[str]:
 
 def get_environment_languages() -> Iterator[str]:
     """
-    Returns a list of the user's preferred languages, inferred by the environment variables LANG and LANGUAGE.
+    Returns an iterator of the user's preferred languages,
+    inferred from the environment variables `LANG`, `LANGUAGE`, and `TLDR_LANGUAGE`.
 
-    See https://github.com/tldr-pages/tldr/blob/main/CLIENT-SPECIFICATION.md#language for details.
+    See https://github.com/tldr-pages/tldr/blob/main/CLIENT-SPECIFICATION.md#language for more details.
     """
 
     languages: list[str] = []
@@ -87,6 +90,7 @@ def get_language_directory(language_code: str) -> str:
 
 
 def get_locales(ctx: Context) -> list[str]:
+    """Return an ordered list of the languages that the user specifies."""
     language = ctx.params.get('language')
     if language is not None:
         page_locale = get_language_directory(language)
