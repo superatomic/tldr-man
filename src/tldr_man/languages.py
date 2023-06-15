@@ -56,12 +56,12 @@ def get_environment_languages() -> Iterator[str]:
     return map(get_language_directory, languages)
 
 
-def _language_code_as_parts(language_code: str) -> (str, str):
+def _language_code_as_parts(language_code: str) -> tuple[str, str]:
     """Removes country codes from language codes and preforms data normalization."""
-    code = language_code.split('.')[0].split('_', 1)
+    language, is_region, region = language_code.split('.')[0].partition('_')
 
-    language = code[0].strip().lower()
-    region = code[1].strip().upper() if len(code) >= 2 else language.upper()
+    language = language.strip().lower()
+    region = region.strip().upper() if is_region else language.upper()
 
     return language, region
 
