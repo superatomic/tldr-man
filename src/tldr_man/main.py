@@ -40,7 +40,7 @@ from click_help_colors import HelpColorsCommand
 
 from tldr_man import pages
 from tldr_man.languages import get_locales
-from tldr_man.util import unique, mkstemp_path, exit_with
+from tldr_man.util import unique, mkstemp_path
 
 
 TLDR_COMMAND_NAME = 'tldr'
