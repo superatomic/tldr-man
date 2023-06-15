@@ -38,7 +38,8 @@ import click
 from click import Context
 from click_help_colors import HelpColorsCommand
 
-from tldr_man import languages, pages
+from tldr_man import pages
+from tldr_man.languages import get_locales
 from tldr_man.util import unique, mkstemp_path, exit_with
 
 
@@ -178,18 +179,6 @@ def cli(locales, page_sections, page: list[str], **_):
 
     if page is not None:
         pages.display_page(page)
-
-
-def get_locales(ctx: Context) -> list[str]:
-    language = ctx.params.get('language')
-    if language is not None:
-        page_locale = languages.get_language_directory(language)
-        if page_locale not in languages.all_languages():
-            exit_with(f"Unrecognized locale: {language}")
-        else:
-            return [page_locale]
-    else:
-        return list(languages.get_environment_languages())
 
 
 def get_page_sections(ctx: Context) -> list[str]:

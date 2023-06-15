@@ -17,7 +17,10 @@
 from os import getenv
 from collections.abc import Iterator
 
+from click import Context
+
 from tldr_man.pages import TLDR_CACHE_HOME, language_directory_to_code
+from tldr_man.util import exit_with
 
 
 def all_languages() -> Iterator[str]:
@@ -81,3 +84,15 @@ def get_language_directory(language_code: str) -> str:
             return full_locale
         else:
             return f'pages.{language}'
+
+
+def get_locales(ctx: Context) -> list[str]:
+    language = ctx.params.get('language')
+    if language is not None:
+        page_locale = get_language_directory(language)
+        if page_locale not in all_languages():
+            exit_with(f"Unrecognized locale: {language}")
+        else:
+            return [page_locale]
+    else:
+        return list(get_environment_languages())
