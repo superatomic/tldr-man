@@ -21,8 +21,12 @@ from tldr_man.pages import TLDR_CACHE_HOME
 
 
 def all_languages() -> Iterator[str]:
+    return map(get_language_directory, all_language_codes())
+
+
+def all_language_codes() -> Iterator[str]:
     return (
-        get_language_directory(pages_dir.name.removeprefix('pages').lstrip('.') or 'en')
+        pages_dir.name.removeprefix('pages').lstrip('.') or 'en'
         for pages_dir in TLDR_CACHE_HOME.iterdir()
         if pages_dir.is_dir()
     )
