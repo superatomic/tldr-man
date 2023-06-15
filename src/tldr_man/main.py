@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# Copyright 2022 Ethan Kinnear
+# Copyright 2023 Olivia Kinnear
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ or visit the project repository at https://github.com/superatomic/tldr-man-clien
 
 from importlib import metadata
 __version__ = metadata.version('tldr-man')
-__author__ = "Ethan Kinnear <contact@superatomic.dev>"
+__author__ = "Olivia Kinnear <contact@superatomic.dev>"
 
 import sys
 from pathlib import Path
