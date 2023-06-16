@@ -135,7 +135,7 @@ def update_cache() -> None:
                 res_dir.mkdir(parents=True, exist_ok=True)  # Create the directories if they don't exist.
 
                 # Create the label for the progress bars that are shown.
-                progressbar_label = (style(f'{language_dir.name:11s}', fg='blue')
+                progressbar_label = (style(f"{language_directory_to_code(language_dir):5s}", fg='blue')
                                      + ' / '
                                      + style(f'{sections_dir.name:7s}', fg='blue'))
 
