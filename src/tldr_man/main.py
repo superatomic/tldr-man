@@ -35,6 +35,7 @@ from click import Context, command, argument, option, version_option, help_optio
 from click_help_colors import HelpColorsCommand
 
 from tldr_man import pages
+from tldr_man.shell_completion import page_shell_complete, language_shell_complete
 from tldr_man.languages import get_locales
 from tldr_man.platforms import get_page_sections, TLDR_PLATFORMS
 from tldr_man.util import unique, mkstemp_path
@@ -125,7 +126,7 @@ def subcommand_manpath(locales, page_sections):
 
 
 @command(cls=HelpColorsCommand, help_headers_color='yellow', help_options_color='green', no_args_is_help=True)
-@argument('page', nargs=-1, required=True)
+@argument('page', nargs=-1, required=True, shell_complete=page_shell_complete)
 @option('-p', '--platform',
         metavar='PLATFORM',
         type=click.Choice(TLDR_PLATFORMS),
@@ -134,6 +135,7 @@ def subcommand_manpath(locales, page_sections):
 @option('-L', '--language',
         metavar='LANGUAGE',
         is_eager=True,
+        shell_complete=language_shell_complete,
         help='Specify a preferred language')
 @option('-u', '--update',
         callback=subcommand_update, expose_value=False,
