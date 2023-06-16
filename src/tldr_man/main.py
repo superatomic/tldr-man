@@ -121,7 +121,7 @@ def subcommand_list(locales, page_sections):
 @standalone_subcommand
 @require_tldr_cache
 def subcommand_manpath(locales, page_sections):
-    print(':'.join(unique(str(x.parent) for x in pages.get_dir_search_order(locales, page_sections))))
+    print(':'.join(unique(str(man_dir.parent) for man_dir in pages.get_dir_search_order(locales, page_sections))))
 
 
 @command(cls=HelpColorsCommand, help_headers_color='yellow', help_options_color='green', no_args_is_help=True)
