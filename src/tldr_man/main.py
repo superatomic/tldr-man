@@ -137,10 +137,12 @@ def subcommand_version(_ctx):
 @click.command(cls=HelpColorsCommand, help_headers_color='yellow', help_options_color='green')
 @click.argument('page', nargs=-1, required=True)
 @click.option('-p', '--platform',
+              metavar='PLATFORM',
               type=click.Choice(TLDR_PLATFORMS),
               is_eager=True,
               help='Override the preferred platform')
 @click.option('-L', '--language',
+              metavar='LANGUAGE',
               is_eager=True,
               help='Specify a preferred language')
 @click.option('-u', '--update',
