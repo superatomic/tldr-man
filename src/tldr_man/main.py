@@ -155,8 +155,9 @@ def subcommand_manpath(locales, page_sections):
         help='Print the paths to the tldr manpages')
 @version_option(None, '-v', '-V', '--version',
                 message="%(prog)s %(version)s",
-                help='Display the version and exit.')
-@help_option('-h', '--help')
+                help='Display the version and exit')
+@help_option('-h', '--help',
+             help='Show this message and exit')
 @pass_context
 @require_tldr_cache
 def cli(locales, page_sections, page: list[str], **_):
