@@ -27,12 +27,10 @@ from importlib import metadata
 __version__ = metadata.version('tldr-man')
 __author__ = "Olivia Kinnear <contact@superatomic.dev>"
 
-import sys
 from pathlib import Path
 from contextlib import suppress
 from os import remove
 from functools import wraps
-from typing import Optional
 
 import click
 from click import Context
@@ -40,12 +38,11 @@ from click_help_colors import HelpColorsCommand
 
 from tldr_man import pages
 from tldr_man.languages import get_locales
+from tldr_man.platforms import get_page_sections, TLDR_PLATFORMS
 from tldr_man.util import unique, mkstemp_path
 
 
 TLDR_COMMAND_NAME = 'tldr'
-
-TLDR_PLATFORMS = 'android linux macos osx sunos windows'.split()
 
 
 def standalone_subcommand(func):
@@ -93,6 +90,7 @@ def require_tldr_cache(func):
         return func(locales, page_sections, *args, **kwargs)
 
     return wrapper
+
 
 @standalone_subcommand
 def subcommand_update(_ctx):
@@ -179,36 +177,6 @@ def cli(locales, page_sections, page: list[str], **_):
 
     if page is not None:
         pages.display_page(page)
-
-
-def get_page_sections(ctx: Context) -> list[str]:
-    page_sections = ['common']
-
-    current_platform = get_current_platform()
-    custom_platform = ctx.params.get('platform')
-
-    if current_platform:
-        page_sections.insert(0, current_platform)
-
-    if custom_platform:
-        page_sections.insert(0, custom_platform.replace('macos', 'osx'))
-
-    return page_sections
-
-
-def get_current_platform() -> Optional[str]:
-    """Get the correct tldr platform directory name from `sys.platform`."""
-    match sys.platform:
-        case 'darwin':
-            return 'osx'
-        case 'linux':
-            return 'linux'
-        case 'win32' | 'cygwin' | 'msys':
-            return 'windows'
-        case 'sunos5':
-            return 'sunos'
-        case _:
-            return None
 
 
 if __name__ == '__main__':
