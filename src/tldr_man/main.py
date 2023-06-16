@@ -175,10 +175,10 @@ def cli(locales, page_sections, page: list[str], **_):
     """TLDR client that displays tldr-pages as manpages"""
     page_name = '-'.join(page).strip().lower()
 
-    page = pages.find_page(page_name, locales, page_sections)
+    page_path = pages.find_page(page_name, locales, page_sections)
 
-    if page is not None:
-        pages.display_page(page)
+    if page_path is not None:
+        pages.display_page(page_path)
 
 
 if __name__ == '__main__':
