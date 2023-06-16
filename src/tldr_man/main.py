@@ -31,7 +31,7 @@ from os import remove
 from functools import wraps
 
 import click
-from click import Context
+from click import Context, command, argument, option, version_option, help_option, pass_context
 from click_help_colors import HelpColorsCommand
 
 from tldr_man import pages
@@ -124,40 +124,40 @@ def subcommand_manpath(locales, page_sections):
     print(':'.join(unique(str(x.parent) for x in pages.get_dir_search_order(locales, page_sections))))
 
 
-@click.command(cls=HelpColorsCommand, help_headers_color='yellow', help_options_color='green', no_args_is_help=True)
-@click.argument('page', nargs=-1, required=True)
-@click.option('-p', '--platform',
-              metavar='PLATFORM',
-              type=click.Choice(TLDR_PLATFORMS),
-              is_eager=True,
-              help='Override the preferred platform')
-@click.option('-L', '--language',
-              metavar='LANGUAGE',
-              is_eager=True,
-              help='Specify a preferred language')
-@click.option('-u', '--update',
-              callback=subcommand_update, expose_value=False,
-              is_flag=True,
-              is_eager=True,
-              help='Update the tldr-pages cache')
-@click.option('-r', '--render',
-              callback=subcommand_render, expose_value=False,
-              type=click.Path(exists=True, dir_okay=False, path_type=Path), nargs=1,
-              is_eager=True,
-              help='Render a page locally')
-@click.option('-l', '--list',
-              callback=subcommand_list, expose_value=False,
-              is_flag=True,
-              help='List all the pages for the current platform')
-@click.option('-M', '--manpath',
-              callback=subcommand_manpath, expose_value=False,
-              is_flag=True,
-              help='Print the paths to the tldr manpages')
-@click.version_option(None, '-v', '-V', '--version',
-                      message="%(prog)s %(version)s",
-                      help='Display the version and exit.')
-@click.help_option('-h', '--help')
-@click.pass_context
+@command(cls=HelpColorsCommand, help_headers_color='yellow', help_options_color='green', no_args_is_help=True)
+@argument('page', nargs=-1, required=True)
+@option('-p', '--platform',
+        metavar='PLATFORM',
+        type=click.Choice(TLDR_PLATFORMS),
+        is_eager=True,
+        help='Override the preferred platform')
+@option('-L', '--language',
+        metavar='LANGUAGE',
+        is_eager=True,
+        help='Specify a preferred language')
+@option('-u', '--update',
+        callback=subcommand_update, expose_value=False,
+        is_flag=True,
+        is_eager=True,
+        help='Update the tldr-pages cache')
+@option('-r', '--render',
+        callback=subcommand_render, expose_value=False,
+        type=click.Path(exists=True, dir_okay=False, path_type=Path), nargs=1,
+        is_eager=True,
+        help='Render a page locally')
+@option('-l', '--list',
+        callback=subcommand_list, expose_value=False,
+        is_flag=True,
+        help='List all the pages for the current platform')
+@option('-M', '--manpath',
+        callback=subcommand_manpath, expose_value=False,
+        is_flag=True,
+        help='Print the paths to the tldr manpages')
+@version_option(None, '-v', '-V', '--version',
+                message="%(prog)s %(version)s",
+                help='Display the version and exit.')
+@help_option('-h', '--help')
+@pass_context
 @require_tldr_cache
 def cli(locales, page_sections, page: list[str], **_):
     """TLDR client that displays tldr-pages as manpages"""
