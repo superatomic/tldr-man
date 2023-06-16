@@ -23,8 +23,6 @@ Run `tldr --help` for more information,
 or visit the project repository at https://github.com/superatomic/tldr-man-client.
 """
 
-from importlib import metadata
-__version__ = metadata.version('tldr-man')
 __author__ = "Olivia Kinnear <contact@superatomic.dev>"
 
 from pathlib import Path
@@ -40,9 +38,6 @@ from tldr_man import pages
 from tldr_man.languages import get_locales
 from tldr_man.platforms import get_page_sections, TLDR_PLATFORMS
 from tldr_man.util import unique, mkstemp_path
-
-
-TLDR_COMMAND_NAME = 'tldr'
 
 
 def standalone_subcommand(func):
@@ -129,11 +124,6 @@ def subcommand_manpath(locales, page_sections):
     print(':'.join(unique(str(x.parent) for x in pages.get_dir_search_order(locales, page_sections))))
 
 
-@standalone_subcommand
-def subcommand_version(_ctx):
-    print(TLDR_COMMAND_NAME, __version__)
-
-
 @click.command(cls=HelpColorsCommand, help_headers_color='yellow', help_options_color='green', no_args_is_help=True)
 @click.argument('page', nargs=-1, required=True)
 @click.option('-p', '--platform',
@@ -163,11 +153,9 @@ def subcommand_version(_ctx):
               callback=subcommand_manpath, expose_value=False,
               is_flag=True,
               help='Print the paths to the tldr manpages')
-@click.option('-v', '-V', '--version',
-              callback=subcommand_version, expose_value=False,
-              is_flag=True,
-              is_eager=True,
-              help='Display the version of the client')
+@click.version_option(None, '-v', '-V', '--version',
+                      message="%(prog)s %(version)s",
+                      help='Display the version and exit.')
 @click.help_option('-h', '--help')
 @click.pass_context
 @require_tldr_cache
