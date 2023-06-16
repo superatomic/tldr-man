@@ -157,7 +157,7 @@ def subcommand_version(_ctx):
               callback=subcommand_list, expose_value=False,
               is_flag=True,
               help='List all the pages for the current platform')
-@click.option('--manpath',
+@click.option('-M', '--manpath',
               callback=subcommand_manpath, expose_value=False,
               is_flag=True,
               help='Print the paths to the tldr manpages')
