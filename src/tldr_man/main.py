@@ -134,7 +134,7 @@ def subcommand_version(_ctx):
     print(TLDR_COMMAND_NAME, __version__)
 
 
-@click.command(cls=HelpColorsCommand, help_headers_color='yellow', help_options_color='green')
+@click.command(cls=HelpColorsCommand, help_headers_color='yellow', help_options_color='green', no_args_is_help=True)
 @click.argument('page', nargs=-1, required=True)
 @click.option('-p', '--platform',
               metavar='PLATFORM',
