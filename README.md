@@ -17,6 +17,7 @@ Features:
 - Integrates with `man` to provide a fallback for missing manpages.
 - Supports rendering markdown formatted tldr-pages with `--render`.
 - Local cache abides by the [XDG base directory specification][xdg].
+- Supports shell completion for `bash`, `zsh`, and `fish` shells.
 - And much more!
 
 
