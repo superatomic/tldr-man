@@ -141,7 +141,7 @@ def update_cache() -> None:
                 # `render_manpage()` takes a significant amount of time to run.
                 # Due to the number of pages that need to be rendered,
                 # this function is invoked simultaneously using threads.
-                def to_manpage(tldr_page: zipfile.Path) -> (str, str):
+                def to_manpage(tldr_page: zipfile.Path) -> tuple[str, str]:
                     """Convert a tldr-page into a manpage"""
                     rendered_manpage = render_manpage(tldr_page.read_text())
                     manpage_filename = tldr_page.name.removesuffix('.md') + '.' + TLDR_MANPAGE_SECTION
