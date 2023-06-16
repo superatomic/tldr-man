@@ -129,7 +129,6 @@ def update_cache() -> None:
             if not language_dir.is_dir():
                 continue
             for sections_dir in language_dir.iterdir():
-
                 # Get the full path to the directory where all manpages for this language and section will be extracted.
                 res_dir = tldr_temp_dir / language_dir.name / sections_dir.name / ('man' + TLDR_MANPAGE_SECTION)
                 res_dir.mkdir(parents=True, exist_ok=True)  # Create the directories if they don't exist.
@@ -181,11 +180,10 @@ def update_cache() -> None:
             rmtree(TLDR_CACHE_HOME)
 
         makedirs(TLDR_CACHE_HOME.parent, exist_ok=True)
-
         move(tldr_temp_dir, TLDR_CACHE_HOME)
+
     finally:
         # Clean up any temporary files that aren't gone.
-
         with suppress(NameError, FileNotFoundError):
             # noinspection PyUnboundLocalVariable
             remove(tldr_zip_archive)
