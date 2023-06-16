@@ -1,9 +1,9 @@
 <div>
-    <h1 align="center">tldr-man-client</h1>
+    <h1 align="center">tldr-man</h1>
     <h5 align="center">A tldr-pages client that works just like <code>man</code></h5>
 </div>
 
-`tldr-man-client` is a command-line client for [tldr-pages][tldr-pages],
+`tldr-man` is a command-line client for [tldr-pages][tldr-pages],
 a collection of community-maintained help pages for command-line tools.
 It differs from other clients because it displays its pages as `man` pages.
 
@@ -24,7 +24,7 @@ Features:
 
 ### With Homebrew
 
-Install `tldr-man-client` with [Homebrew](https://brew.sh):
+Install `tldr-man` with [Homebrew](https://brew.sh):
 
 ```shell
 brew install superatomic/tap/tldr-man
@@ -32,13 +32,13 @@ brew install superatomic/tap/tldr-man
 
 ### With Pip
 
-Install `tldr-man-client` with pip (version 3.10+):
+Install `tldr-man` with pip (version 3.10+):
 
 ```shell
 pip install tldr-man
 ```
 
-`tldr-man-client` additionally depends on [`pandoc`](https://pandoc.org/installing.html) being installed.
+`tldr-man` additionally depends on [`pandoc`](https://pandoc.org/installing.html) being installed.
 
 After installation, you can view a tldr-page with the `tldr` command.
 

@@ -15,7 +15,7 @@
 # limitations under the License.
 
 """
-tldr-man-client: Command-line TLDR client that displays tldr-pages as manpages.
+tldr-man: Command-line TLDR client that displays tldr-pages as manpages.
 
 Depends on pandoc (and man!). Install `pandoc` from https://pandoc.org/installing.html.
 
