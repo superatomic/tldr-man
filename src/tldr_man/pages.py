@@ -26,7 +26,7 @@ from typing import Optional
 from collections.abc import Iterable
 
 import requests
-from click import secho, progressbar, style
+from click import secho, progressbar, style, echo
 from xdg import XDG_CACHE_HOME
 
 from tldr_man.util import mkstemp_path, mkdtemp_path, eprint, exit_with
@@ -109,6 +109,8 @@ def update_cache() -> None:
 
     secho('Updating tldr-pages cache...', fg='cyan')
 
+    created, updated, unchanged = 0, 0, 0
+
     try:
         # Create a temporary file for the tldr-pages zip archive to generate manpages from.
         tldr_zip_archive = mkstemp_path('tldr.zip')
@@ -132,6 +134,13 @@ def update_cache() -> None:
                 # Get the full path to the directory where all manpages for this language and section will be extracted.
                 res_dir = tldr_temp_dir / language_dir.name / sections_dir.name / ('man' + TLDR_MANPAGE_SECTION)
                 res_dir.mkdir(parents=True, exist_ok=True)  # Create the directories if they don't exist.
+
+                # Get the directory where the old versions of the manpages are located,
+                # to compare it with the new versions that are generated:
+                original_dir = (
+                    TLDR_CACHE_HOME / language_dir.name / sections_dir.name / ('man' + TLDR_MANPAGE_SECTION)
+                    if TLDR_CACHE_HOME.exists() else None
+                )
 
                 # Create the label for the progress bars that are shown.
                 progressbar_label = (style(f"{language_directory_to_code(language_dir):5s}", fg='blue')
@@ -164,6 +173,14 @@ def update_cache() -> None:
                         for filename, manpage in fut:
                             res_file = res_dir / filename
                             res_file.write_text(manpage)
+
+                            # Log whether the file was created, updated, or unchanged:
+                            if original_dir is None or not (original_file := original_dir / filename).exists():
+                                created += 1
+                            elif original_file.read_text() != manpage:
+                                updated += 1
+                            else:
+                                unchanged += 1
                     except:
                         # If an exception occurs, such as a KeyboardInterrupt or an actual Exception,
                         # shutdown the pool *without* waiting for any remaining futures to finish. This will prevent the
@@ -191,7 +208,12 @@ def update_cache() -> None:
             # noinspection PyUnboundLocalVariable
             rmtree(tldr_temp_dir)
 
-    secho('Done!', fg='green', bold=True)
+    # Display the details for the cache update:
+    echo(', '.join([
+        style(f'{created} Added', fg='green', bold=True),
+        style(f'{updated} Updated', fg='blue', bold=True),
+        style(f'{unchanged} Unchanged', bold=True),
+    ]))
 
 
 def render_manpage(tldr_page: str) -> str:
