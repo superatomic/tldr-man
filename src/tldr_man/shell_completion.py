@@ -29,7 +29,7 @@ def page_shell_complete(ctx: Context, param: Parameter, incomplete: str) -> list
     locales: list[str] = get_locales(ctx)
     page_sections: list[str] = get_page_sections(ctx)
 
-    completed_part = ''.join([part + '-' for part in ctx.params[param.name] or []])
+    completed_part = ''.join(part + '-' for part in ctx.params[param.name] or [])
 
     return [
         CompletionItem(page.stem.removeprefix(completed_part))
