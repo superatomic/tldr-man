@@ -17,13 +17,13 @@
 from click import Context, Parameter
 from click.shell_completion import CompletionItem
 
-from tldr_man.pages import TLDR_CACHE_HOME, get_dir_search_order
+from tldr_man.pages import CACHE_DIR, get_dir_search_order
 from tldr_man.languages import get_locales, all_language_codes
 from tldr_man.platforms import get_page_sections
 
 
 def page_shell_complete(ctx: Context, param: Parameter, incomplete: str) -> list[CompletionItem]:
-    if not TLDR_CACHE_HOME.exists() or param.name is None: # the `param.name is None` check makes the type checker happy
+    if not CACHE_DIR.exists() or param.name is None: # the `param.name is None` check makes the type checker happy
         return []
 
     locales: list[str] = get_locales(ctx)
@@ -41,6 +41,6 @@ def page_shell_complete(ctx: Context, param: Parameter, incomplete: str) -> list
 
 
 def language_shell_complete(_ctx: Context, _param: Parameter, _incomplete: str) -> list[CompletionItem]:
-    if not TLDR_CACHE_HOME.exists():
+    if not CACHE_DIR.exists():
         return []
     return [CompletionItem(code) for code in all_language_codes()]

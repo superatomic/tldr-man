@@ -19,7 +19,7 @@ import zipfile
 from concurrent.futures import ThreadPoolExecutor
 from contextlib import suppress
 from pathlib import Path
-from os import remove, makedirs
+from os import remove, makedirs, getenv
 from shutil import rmtree, move
 from subprocess import run, PIPE, DEVNULL
 from typing import Optional
@@ -27,11 +27,10 @@ from collections.abc import Iterable
 
 import requests
 from click import secho, progressbar, style, echo
-from xdg import XDG_CACHE_HOME
 
 from tldr_man.util import mkstemp_path, mkdtemp_path, eprint, exit_with
 
-TLDR_CACHE_DIR_NAME = 'tldr-man'
+CACHE_DIR_NAME = 'tldr-man'
 
 ZIP_ARCHIVE_URL = "https://tldr.sh/assets/tldr.zip"
 
@@ -78,11 +77,19 @@ The tldr-pages cache needs to be generated before `tldr` can be used.
 """[1:-1]
 
 
-def tldr_cache_home(location: Path = XDG_CACHE_HOME) -> Path:
-    return location / TLDR_CACHE_DIR_NAME
+def getenv_dir(key: str, default: Optional[Path] = None) -> Optional[Path]:
+    if value := getenv(key):
+        path = Path(value)
+        if path.is_absolute():
+            return path.resolve()
+    return default
 
 
-TLDR_CACHE_HOME: Path = tldr_cache_home()
+def get_cache_dir() -> Path:
+    return getenv_dir('XDG_CACHE_HOME', Path.home() / '.cache') / CACHE_DIR_NAME
+
+
+CACHE_DIR: Path = get_cache_dir()
 
 
 def download_archive(location: Path, url: str = ZIP_ARCHIVE_URL) -> None:
@@ -138,8 +145,8 @@ def update_cache() -> None:
                 # Get the directory where the old versions of the manpages are located,
                 # to compare it with the new versions that are generated:
                 original_dir = (
-                    TLDR_CACHE_HOME / language_dir.name / sections_dir.name / ('man' + MANPAGE_SECTION)
-                    if TLDR_CACHE_HOME.exists() else None
+                    CACHE_DIR / language_dir.name / sections_dir.name / ('man' + MANPAGE_SECTION)
+                    if CACHE_DIR.exists() else None
                 )
 
                 # Create the label for the progress bars that are shown.
@@ -194,10 +201,10 @@ def update_cache() -> None:
         # and move the new cache into the correct directory from the temporary directory.
 
         with suppress(FileNotFoundError):
-            rmtree(TLDR_CACHE_HOME)
+            rmtree(CACHE_DIR)
 
-        makedirs(TLDR_CACHE_HOME.parent, exist_ok=True)
-        move(temp_cache_dir, TLDR_CACHE_HOME)
+        makedirs(CACHE_DIR.parent, exist_ok=True)
+        move(temp_cache_dir, CACHE_DIR)
 
     finally:
         # Clean up any temporary files that aren't gone.
@@ -266,7 +273,7 @@ def pandoc_exists() -> bool:
 
 def verify_tldr_cache_exists():
     """Display a specific message if the tldr manpage cache doesn't exist yet, and then exit."""
-    if not TLDR_CACHE_HOME.exists():
+    if not CACHE_DIR.exists():
         exit_with(CACHE_DOES_NOT_EXIST_MESSAGE)
 
 
@@ -292,7 +299,7 @@ def find_page(page_name: str, /, locales: Iterable[str], page_sections: Iterable
 
 def get_dir_search_order(locales: Iterable[str], page_sections: Iterable[str]) -> Iterable[Path]:
     return (
-        TLDR_CACHE_HOME / locale / section / ('man' + MANPAGE_SECTION)
+        CACHE_DIR / locale / section / ('man' + MANPAGE_SECTION)
         for locale in locales
         for section in page_sections
     )

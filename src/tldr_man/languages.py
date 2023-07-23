@@ -19,7 +19,7 @@ from collections.abc import Iterator
 
 from click import Context
 
-from tldr_man.pages import TLDR_CACHE_HOME, language_directory_to_code
+from tldr_man.pages import CACHE_DIR, language_directory_to_code
 from tldr_man.util import exit_with
 
 
@@ -32,7 +32,7 @@ def all_language_codes() -> Iterator[str]:
     """Returns an iterator of all language codes, based on all language directories."""
     return (
         language_directory_to_code(pages_dir)
-        for pages_dir in TLDR_CACHE_HOME.iterdir()
+        for pages_dir in CACHE_DIR.iterdir()
         if pages_dir.is_dir()
     )
 
@@ -83,7 +83,7 @@ def get_language_directory(language_code: str) -> str:
         return 'pages'
     else:
         full_locale = f'pages.{language}_{region}'
-        if (TLDR_CACHE_HOME / full_locale).is_dir():
+        if (CACHE_DIR / full_locale).is_dir():
             return full_locale
         else:
             return f'pages.{language}'

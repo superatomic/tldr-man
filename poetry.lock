@@ -186,18 +186,7 @@ secure = ["certifi", "cryptography (>=1.9)", "idna (>=2.0.0)", "pyopenssl (>=17.
 socks = ["pysocks (>=1.5.6,!=1.5.7,<2.0)"]
 zstd = ["zstandard (>=0.18.0)"]
 
-[[package]]
-name = "xdg"
-version = "5.1.1"
-description = "Variables defined by the XDG Base Directory Specification"
-optional = false
-python-versions = ">=3.6,<4.0"
-files = [
-    {file = "xdg-5.1.1-py3-none-any.whl", hash = "sha256:865a7b56ed1d4cd2fce2ead1eddf97360843619757f473cd90b75f1817ca541d"},
-    {file = "xdg-5.1.1.tar.gz", hash = "sha256:aa619f26ccec6088b2a6018721d4ee86e602099b24644a90a8d3308a25acd06c"},
-]
-
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10.4"
-content-hash = "26ebc4bcdd53d9dbac7ae54acd97a28a123ca309e2c288cb79d5879b42be069f"
+content-hash = "d42533b3fd33f7d1bc87bc5b0d9542972cf1eba2b5934e32a93dfb88a2e2a88e"
