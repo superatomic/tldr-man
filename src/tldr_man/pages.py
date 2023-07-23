@@ -33,12 +33,12 @@ from tldr_man.util import mkstemp_path, mkdtemp_path, eprint, exit_with
 
 TLDR_CACHE_DIR_NAME = 'tldr-man'
 
-TLDR_ZIP_ARCHIVE_URL = "https://tldr.sh/assets/tldr.zip"
+ZIP_ARCHIVE_URL = "https://tldr.sh/assets/tldr.zip"
 
-TLDR_MANPAGE_SECTION = '1'
+MANPAGE_SECTION = '1'
 
 MANPAGE_HEADER = f"""
-% {{name}}({TLDR_MANPAGE_SECTION}) {{name}}
+% {{name}}({MANPAGE_SECTION}) {{name}}
 %
 % tldr-man-client
 
@@ -85,7 +85,7 @@ def tldr_cache_home(location: Path = XDG_CACHE_HOME) -> Path:
 TLDR_CACHE_HOME: Path = tldr_cache_home()
 
 
-def download_tldr_zip_archive(location: Path, url: str = TLDR_ZIP_ARCHIVE_URL) -> None:
+def download_archive(location: Path, url: str = ZIP_ARCHIVE_URL) -> None:
     """Downloads the current tldr-pages zip archive into a specific location."""
 
     try:
@@ -113,32 +113,32 @@ def update_cache() -> None:
 
     try:
         # Create a temporary file for the tldr-pages zip archive to generate manpages from.
-        tldr_zip_archive = mkstemp_path('tldr.zip')
-        download_tldr_zip_archive(tldr_zip_archive)
+        zip_archive_location = mkstemp_path('tldr.zip')
+        download_archive(zip_archive_location)
 
         # Create the cache directory that will be copied to `~/.cache/tldr-man`.
-        tldr_temp_dir = mkdtemp_path('tldr-man')
+        temp_cache_dir = mkdtemp_path('tldr-man')
 
         # Get the zip file
         try:
-            tldr_zip_path = zipfile.Path(tldr_zip_archive)
+            zip_path = zipfile.Path(zip_archive_location)
         except zipfile.BadZipFile:
-            eprint(f"Error: Got a bad zipfile from {TLDR_ZIP_ARCHIVE_URL}")
+            eprint(f"Error: Got a bad zipfile from {ZIP_ARCHIVE_URL}")
             raise
 
         # Iterate through each language and section in the zip file.
-        for language_dir in tldr_zip_path.iterdir():
+        for language_dir in zip_path.iterdir():
             if not language_dir.is_dir():
                 continue
             for sections_dir in language_dir.iterdir():
                 # Get the full path to the directory where all manpages for this language and section will be extracted.
-                res_dir = tldr_temp_dir / language_dir.name / sections_dir.name / ('man' + TLDR_MANPAGE_SECTION)
+                res_dir = temp_cache_dir / language_dir.name / sections_dir.name / ('man' + MANPAGE_SECTION)
                 res_dir.mkdir(parents=True, exist_ok=True)  # Create the directories if they don't exist.
 
                 # Get the directory where the old versions of the manpages are located,
                 # to compare it with the new versions that are generated:
                 original_dir = (
-                    TLDR_CACHE_HOME / language_dir.name / sections_dir.name / ('man' + TLDR_MANPAGE_SECTION)
+                    TLDR_CACHE_HOME / language_dir.name / sections_dir.name / ('man' + MANPAGE_SECTION)
                     if TLDR_CACHE_HOME.exists() else None
                 )
 
@@ -153,7 +153,7 @@ def update_cache() -> None:
                 def to_manpage(tldr_page: zipfile.Path) -> tuple[str, str]:
                     """Convert a tldr-page into a manpage"""
                     rendered_manpage = render_manpage(tldr_page.read_text())
-                    manpage_filename = tldr_page.name.removesuffix('.md') + '.' + TLDR_MANPAGE_SECTION
+                    manpage_filename = tldr_page.name.removesuffix('.md') + '.' + MANPAGE_SECTION
                     # Return the filename to save the manpage to along with the rendered manpage itself.
                     return manpage_filename, rendered_manpage
 
@@ -197,16 +197,16 @@ def update_cache() -> None:
             rmtree(TLDR_CACHE_HOME)
 
         makedirs(TLDR_CACHE_HOME.parent, exist_ok=True)
-        move(tldr_temp_dir, TLDR_CACHE_HOME)
+        move(temp_cache_dir, TLDR_CACHE_HOME)
 
     finally:
         # Clean up any temporary files that aren't gone.
         with suppress(NameError, FileNotFoundError):
             # noinspection PyUnboundLocalVariable
-            remove(tldr_zip_archive)
+            remove(zip_archive_location)
         with suppress(NameError, FileNotFoundError):
             # noinspection PyUnboundLocalVariable
-            rmtree(tldr_temp_dir)
+            rmtree(temp_cache_dir)
 
     # Display the details for the cache update:
     echo(', '.join([
@@ -282,7 +282,7 @@ def display_page(page: Path) -> None:
 
 def find_page(page_name: str, /, locales: Iterable[str], page_sections: Iterable[str]) -> Optional[Path]:
     for search_dir in get_dir_search_order(locales, page_sections):
-        page = search_dir / (page_name + '.' + TLDR_MANPAGE_SECTION)
+        page = search_dir / (page_name + '.' + MANPAGE_SECTION)
 
         if page.exists():
             return page
@@ -292,7 +292,7 @@ def find_page(page_name: str, /, locales: Iterable[str], page_sections: Iterable
 
 def get_dir_search_order(locales: Iterable[str], page_sections: Iterable[str]) -> Iterable[Path]:
     return (
-        TLDR_CACHE_HOME / locale / section / ('man' + TLDR_MANPAGE_SECTION)
+        TLDR_CACHE_HOME / locale / section / ('man' + MANPAGE_SECTION)
         for locale in locales
         for section in page_sections
     )
