@@ -11,6 +11,7 @@ documentation = 'https://github.com/superatomic/tldr-man-client#readme'
 keywords = ['tldr', 'tldr-pages', 'man', 'manpage', 'tldr-client']
 classifiers = [
     'Development Status :: 5 - Production/Stable',
+    'Environment :: Console',
     'Intended Audience :: Developers',
     'Intended Audience :: End Users/Desktop',
     'Intended Audience :: System Administrators',
@@ -21,6 +22,8 @@ classifiers = [
     'Operating System :: POSIX :: SunOS/Solaris',
     'Operating System :: Unix',
     'Programming Language :: Unix Shell',
+    'Topic :: Documentation',
+    'Topic :: Software Development :: Documentation',
     'Topic :: Text Processing :: Markup :: Markdown',
     'Topic :: Utilities',
 ]
