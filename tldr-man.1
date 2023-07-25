@@ -1,0 +1,269 @@
+.\" Copyright 2023 Olivia Kinnear
+.\"
+.\" Licensed under the Apache License, Version 2.0 (the "License");
+.\" you may not use this file except in compliance with the License.
+.\" You may obtain a copy of the License at
+.\"
+.\" http://www.apache.org/licenses/LICENSE-2.0
+.\"
+.\" Unless required by applicable law or agreed to in writing, software
+.\" distributed under the License is distributed on an "AS IS" BASIS,
+.\" WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+.\" See the License for the specific language governing permissions and
+.\" limitations under the License.
+.TH "tldr\-man" 1
+.SH "NAME"
+tldr\-man \- display simple help pages for command\-line tools from the tldr\-pages project as manpages
+.SH "SYNOPSIS"
+.SY tldr
+.RB [ \-L | \-\-language
+.IR LANGUAGE ]
+.RB [ \-p | \-\-platform
+.IR PLATFORM ]
+.IR PAGE ...
+.SY tldr
+.RB [ \-L | \-\-language
+.IR LANGUAGE ]
+.RB [ \-p | \-\-platform
+.IR PLATFORM ]
+.BR \-l | \-\-list
+.SY tldr
+.RB [ \-L | \-\-language
+.IR LANGUAGE ]
+.RB [ \-p | \-\-platform
+.IR PLATFORM ]
+.BR \-M | \-\-manpath
+.SY tldr
+.BR \-r | \-\-render
+.IR FILE
+.SY tldr
+.BR \-u | \-\-update
+.SY tldr
+.BR \-v | \-\-version
+.SY tldr
+.BR \-h | \-\-help
+.YS
+.SH "DESCRIPTION"
+.PP
+.B tldr\-man
+is a command\-line client for \f[B]tldr\-pages\f[R],
+a collection of community\-maintained help pages for command\-line tools.
+It differs from other clients because it displays its pages as
+.BR man (1)
+pages.
+.PP
+This client is able to integrate with the
+.BR man (1)
+command to fall back to displaying a tldr\-page for a command when no manpage exists.
+.PP
+The
+.BR pandoc (1)
+tool must be installed and present on
+.B $PATH
+for tldr\-man to function. Instructions for installing pandoc can be found at
+.UR https://pandoc.org/installing.html
+.UE .
+.SH "OPTIONS"
+.SS Arguments
+.TP
+.IR PAGE ...
+The name of the tldr\-page to display.
+.TP
+.BR \-l ", " \-\-list
+List all available tldr\-pages for the current platform and language with one page name per line.
+.TP
+.BR \-M ", " \-\-manpage
+Prints a colon\-separated list of manpaths to be appended to
+.BR $MANPATH .
+See the
+.B MAN INTEGRATION
+section for more information.
+.TP
+.BR \-r " " \f[I]FILE\f[R] ", " \-\-render = \f[I]FILE\f[R]
+Instead of displaying a page, render
+.I FILE
+(in the tldr\-pages markdown format) in the
+.BR roff (7)
+format and display it.
+.TP
+.BR \-u ", " \-\-update
+Update the local cache of rendered
+.BR man (1)
+pages by getting the updated list of pages from the internet and rendering them.
+This command must be run before any pages are displayed.
+.TP
+.BR \-v ", " \-\-version
+Print this command\[aq]s version and exit.
+.TP
+.BR \-h ", " \-\-help
+Print this command\[aq]s help and exit.
+.SS General Options
+.TP
+.BR \-L " " \f[I]LANGUAGE\f[R] ", " \-\-language = \f[I]LANGUAGE\f[R]
+Set the language to display. Overrides any languages specified by environment variables.
+.I LANGUAGE
+must be a country code, such as
+.BR en ", " es ", " fr ", " zh ", or " zh_TW .
+.TP
+.BR \-p " " \f[I]PLATFORM\f[R] ", " \-\-platform = \f[I]PLATFORM\f[R]
+Set the platform to display.
+.I PLATFORM
+must be one of
+.BR android ", " linux ", " macos ", " osx ", " sunos ", and " windows .
+.SH "EXIT STATUS"
+.PP
+If tldr\-man completes successfully, it will return exit code \f[B]0\f[R].
+Nonzero exit codes have the following meanings:
+.TP
+.B 1
+General error
+.TP
+.B 2
+Invalid usage
+.TP
+.B 3
+Page cache does not exist
+.TP
+.B 127
+The external commands
+.BR man (1)
+or
+.BR pandoc (1)
+were not found on
+.B $PATH
+.SH "ENVIRONMENT"
+.TP
+.BR TLDR_LANGUAGE ", " LANGUAGE ", " LANG
+If the
+.RB [ \-L | \-\-language ]
+option is not set, these environment variables determine the languages that are displayed. \
+Each variable must contain a colon\-separated list of languages,
+which will be checked in order until an existing page is found.
+For example,
+.B en:fr:zh_TW
+is a valid value for each of these variables.
+The order of priority is
+.BR TLDR_LANGUAGE ", " LANGUAGE ", " LANG ,
+with the values of
+.B TLDR_LANGUAGE
+being checked first and
+.B LANG
+being checked last.
+If none of these environment variables are set or if no valid pages exist for any of the languages,
+this defaults back to
+.BR en .
+.SH "FILES"
+.TP
+.BR $XDG_CACHE_HOME/tldr_man
+The location that the tldr\-pages (in
+.BR roff (7)
+format) are stored.
+This directory is created by running the
+.B tldr \-\-update
+.R command, and the cache is accessed by
+.B tldr
+.IR PAGE ,
+.BR "tldr \-\-list" ", and"
+.BR "tldr \-\-manpath" " commands."
+.SH "CONFORMING TO"
+.PP
+.UR https://github.com/tldr-pages/tldr/blob/main/CLIENT-SPECIFICATION.md
+TLDR\-Pages Client Specification
+.UE .
+.PP
+.UR https://standards.freedesktop.org/basedir-spec/basedir-spec-latest
+XDG Base Directory Specification
+.UE .
+.SH "EXAMPLES"
+.PP
+Display the tldr\-page for
+.BR git (1):
+.PP
+.nf
+.RS
+.B tldr \f[I]git\f[B]
+.RE
+.fi
+.PP
+Update the local page cache:
+.PP
+.nf
+.RS
+.B tldr \-\-update
+.RE
+.fi
+.PP
+Render a page locally:
+.PP
+.nf
+.RS
+.B tldr \-\-render \f[I]path/to/page.md\f[B]
+.RE
+.fi
+.PP
+Print manpage paths as a colon\-separated list:
+.PP
+.nf
+.RS
+.B tldr \-\-manpath
+.RE
+.fi
+.SH "SHELL COMPLETION"
+The file
+.B generate_completion.sh
+that is distributed along with this software can be used to generate shell completions for tldr\-man.
+.SH "MAN INTEGRATION"
+.PP
+The
+.BR man (1)
+command can be set up to fall back to displaying tldr\-pages if no manpages are found.
+.PP
+For
+.BR bash (1)
+place the following line in
+.BR ~/.bash_profile ,
+and for
+.BR zsh (1)
+place the following line in
+.BR ~/.zshenv :
+.PP
+.nf
+.RS
+export MANPATH=\[dq]${MANPATH}:$(tldr \-\-manpath)\[dq]
+.RE
+.fi
+.PP
+For
+.BR fish (1),
+place the following line in
+.BR $XDG_CONFIG_HOME/fish/config.fish :
+.PP
+.nf
+.RS
+set \-gxa MANPATH (tldr \-\-manpath)
+.RE
+.fi
+.SH "HOMEPAGE"
+.PP
+This software is available at
+.UR https://github.com/superatomic/tldr-man-client
+.UE ,
+and can be found on PyPI at
+.UR https://pypi.org/project/tldr-man
+.UE .
+.SH "REPORTING BUGS"
+.PP
+Please report bugs and feature requests in the issue tracker at
+.UR https://github.com/superatomic/tldr-man-client
+.UE .
+Please do your best to provide a reproducible test case for bugs.
+.SH "COPYRIGHT"
+Copyright 2023 Olivia Kinnear
+.br
+Licensed under the Apache License, Version 2.0
+.SH "SEE ALSO"
+.BR man (1),
+.BR pandoc (1),
+.BR man\-pages (7)
+.SH "VERSION"
+1.2.0

@@ -27,7 +27,7 @@ classifiers = [
     'Topic :: Text Processing :: Markup :: Markdown',
     'Topic :: Utilities',
 ]
-include = ["generate_completions.sh"]
+include = ["generate_completions.sh", "tldr-man.1"]
 
 [tool.poetry.urls]
 "Bug Tracker" = "https://github.com/superatomic/tldr-man-client/issues"
