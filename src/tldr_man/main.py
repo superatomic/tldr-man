@@ -63,6 +63,9 @@ def standalone_subcommand(func):
             # If `sys.exit()` was called, exit that context with the given status code.
             exited_with_error = True  # Don't call the `ctx.exit()` in the `finally` block
             ctx.exit(err.code)
+        except KeyboardInterrupt:
+            exited_with_error = True
+            ctx.exit(130)
         finally:
             if not exited_with_error:
                 ctx.exit()

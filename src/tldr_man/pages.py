@@ -274,7 +274,7 @@ def pandoc_exists() -> bool:
 def verify_tldr_cache_exists():
     """Display a specific message if the tldr manpage cache doesn't exist yet, and then exit."""
     if not CACHE_DIR.exists():
-        exit_with(CACHE_DOES_NOT_EXIST_MESSAGE)
+        exit_with(CACHE_DOES_NOT_EXIST_MESSAGE, exitcode=3)
 
 
 def display_page(page: Path) -> None:
@@ -294,7 +294,7 @@ def find_page(page_name: str, /, locales: Iterable[str], page_sections: Iterable
         if page.exists():
             return page
     else:
-        eprint(PAGE_NOT_FOUND_MESSAGE.format(page_name=page_name))
+        exit_with(PAGE_NOT_FOUND_MESSAGE.format(page_name=page_name))
 
 
 def get_dir_search_order(locales: Iterable[str], page_sections: Iterable[str]) -> Iterable[Path]:
