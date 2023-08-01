@@ -8,6 +8,7 @@ authors = ["Olivia Kinnear <contact@superatomic.dev>"]
 homepage = 'https://tldr-man.superatomic.dev/'
 repository = 'https://github.com/superatomic/tldr-man-client'
 documentation = 'https://github.com/superatomic/tldr-man-client#readme'
+urls = {'Bug Tracker' = 'https://github.com/superatomic/tldr-man-client/issues'}
 keywords = ['tldr', 'tldr-pages', 'man', 'manpage', 'tldr-client']
 classifiers = [
     'Development Status :: 5 - Production/Stable',
@@ -28,10 +29,6 @@ classifiers = [
     'Topic :: Utilities',
 ]
 include = ["generate_completions.sh", "tldr-man.1"]
-
-[tool.poetry.urls]
-"Bug Tracker" = "https://github.com/superatomic/tldr-man-client/issues"
-"Say Thanks!" = "https://saythanks.io/to/superatomic"
 
 [tool.poetry.dependencies]
 python = "^3.10.4"
