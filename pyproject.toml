@@ -6,9 +6,9 @@ license = 'Apache-2.0'
 readme = "README.md"
 authors = ["Olivia Kinnear <contact@superatomic.dev>"]
 homepage = 'https://tldr-man.superatomic.dev/'
-repository = 'https://github.com/superatomic/tldr-man-client'
-documentation = 'https://github.com/superatomic/tldr-man-client#readme'
-urls = {'Bug Tracker' = 'https://github.com/superatomic/tldr-man-client/issues'}
+repository = 'https://github.com/superatomic/tldr-man'
+documentation = 'https://github.com/superatomic/tldr-man#readme'
+urls = {'Bug Tracker' = 'https://github.com/superatomic/tldr-man/issues'}
 keywords = ['tldr', 'tldr-pages', 'man', 'manpage', 'tldr-client']
 classifiers = [
     'Development Status :: 5 - Production/Stable',

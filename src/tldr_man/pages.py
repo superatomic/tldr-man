@@ -39,7 +39,7 @@ MANPAGE_SECTION = '1'
 MANPAGE_HEADER = f"""
 % {{name}}({MANPAGE_SECTION}) {{name}}
 %
-% tldr-man-client
+% tldr-man
 
 # NAME
 {{name}} - {{desc}}

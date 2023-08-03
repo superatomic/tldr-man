@@ -20,7 +20,7 @@ tldr-man: Command-line TLDR client that displays tldr-pages as manpages.
 Depends on pandoc (and man!). Install `pandoc` from https://pandoc.org/installing.html.
 
 Run `tldr --help` for more information,
-or visit the project repository at https://github.com/superatomic/tldr-man-client.
+or visit the project repository at https://github.com/superatomic/tldr-man.
 """
 
 __author__ = "Olivia Kinnear <contact@superatomic.dev>"
