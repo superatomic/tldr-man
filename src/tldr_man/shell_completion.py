@@ -15,7 +15,7 @@
 """Rich shell completions for the client."""
 
 from click import Context, Parameter
-from click.shell_completion import CompletionItem
+from click.shell_completion import CompletionItem, BashComplete
 
 from tldr_man.pages import CACHE_DIR, get_dir_search_order
 from tldr_man.languages import get_locales, all_language_codes
@@ -44,3 +44,12 @@ def language_shell_complete(_ctx: Context, _param: Parameter, _incomplete: str) 
     if not CACHE_DIR.exists():
         return []
     return [CompletionItem(code) for code in all_language_codes()]
+
+
+def patch_bash_completion():
+    """
+    Patches click Bash shell completion generation to not raise an error on generating for Bash versions older than 4.4.
+
+    Fixes <https://github.com/superatomic/tldr-man/issues/10>, <https://github.com/pallets/click/issues/2574>.
+    """
+    BashComplete._check_version = lambda _: None
