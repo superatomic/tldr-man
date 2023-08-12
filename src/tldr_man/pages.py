@@ -15,6 +15,7 @@
 """Interact with tldr-pages and the tldr-pages manpage cache."""
 
 import re
+import shlex
 import zipfile
 from concurrent.futures import ThreadPoolExecutor
 from contextlib import suppress
@@ -114,6 +115,8 @@ def update_cache() -> None:
     if not pandoc_exists():
         exit_with(PANDOC_MISSING_MESSAGE, exitcode=127)
 
+    ensure_cache_dir_update_safety()
+
     secho('Updating tldr-pages cache...', fg='cyan')
 
     created, updated, unchanged = 0, 0, 0
@@ -200,6 +203,7 @@ def update_cache() -> None:
         # Now that the updated cache has been generated, remove the old cache, make sure the parent directory exists,
         # and move the new cache into the correct directory from the temporary directory.
 
+        ensure_cache_dir_update_safety()
         with suppress(FileNotFoundError):
             rmtree(CACHE_DIR)
 
@@ -221,6 +225,35 @@ def update_cache() -> None:
         style(f'{updated} Updated', fg='blue', bold=True),
         style(f'{unchanged} Unchanged', bold=True),
     ]))
+
+
+# Matches names in the formats of `pages`, `pages.xx`, and `pages.xx_YY`:
+EXPECTED_CACHE_CONTENT_PATTERN = re.compile(r'^pages(?:\.\w{2}(?:_\w{2})?)?$')
+
+
+def ensure_cache_dir_update_safety():
+    """Make sure not to overwrite directories with user data in them."""
+
+    if not CACHE_DIR.exists():
+        return
+
+    problematic_files = ['  ' + str(path) + ('/' if path.is_dir() else '')
+                         for path in sorted(CACHE_DIR.iterdir(), key=lambda path: (path.is_dir(), path.name))
+                         if not (path.is_dir() and EXPECTED_CACHE_CONTENT_PATTERN.match(path.name))]
+
+    if problematic_files:
+        exit_with('\n\n'.join([
+            f"Error: Cache directory at {CACHE_DIR} contains non-cache files. Updating could cause data loss.",
+            '\n'.join([
+                "The following files would be removed:",
+                *problematic_files,
+            ]),
+            (
+                "To force an update, run the following command to delete the cache "
+                "(this action is potentially destructive!):\n"
+                f"  rm -r {shlex.quote(str(CACHE_DIR))}"
+            ),
+        ]))
 
 
 def render_manpage(tldr_page: str) -> str:
