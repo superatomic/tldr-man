@@ -87,7 +87,7 @@ def getenv_dir(key: str, default: Optional[Path] = None) -> Optional[Path]:
 
 
 def get_cache_dir() -> Path:
-    return getenv_dir('XDG_CACHE_HOME', Path.home() / '.cache') / CACHE_DIR_NAME
+    return getenv_dir('TLDR_MAN_CACHE_DIR') or getenv_dir('XDG_CACHE_HOME', Path.home() / '.cache') / CACHE_DIR_NAME
 
 
 CACHE_DIR: Path = get_cache_dir()

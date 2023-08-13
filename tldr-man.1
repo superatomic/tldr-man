@@ -152,12 +152,21 @@ being checked last.
 If none of these environment variables are set or if no valid pages exist for any of the languages,
 this defaults back to
 .BR en .
+.TP
+.BR TLDR_MAN_CACHE_DIR
+The location of the page cache directory. This directory is created by the
+.B tldr \-\-update
+command and is accessed by other commands.
+If this variable is not set or is not an absolute path, this defaults back to the value of
+.BR $XDG_CACHE_HOME/tldr-man .
 .SH "FILES"
 .TP
 .BR $XDG_CACHE_HOME/tldr_man
 The location that the tldr\-pages (in
 .BR roff (7)
-format) are stored.
+format) are stored if the environment variable
+.B $TLDR_MAN_CACHE_DIR
+is not set or not an absolute path.
 This directory is created by running the
 .B tldr \-\-update
 .R command, and the cache is accessed by
