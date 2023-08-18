@@ -35,13 +35,10 @@ from click import Context, command, argument, option, version_option, help_optio
 from click_help_colors import HelpColorsCommand
 
 from tldr_man import pages
-from tldr_man.shell_completion import page_shell_complete, language_shell_complete, patch_bash_completion
+from tldr_man.shell_completion import page_shell_complete, language_shell_complete
 from tldr_man.languages import get_locales
 from tldr_man.platforms import get_page_sections, TLDR_PLATFORMS
 from tldr_man.util import unique, mkstemp_path
-
-
-patch_bash_completion()  # See issue #10
 
 
 def standalone_subcommand(func):
