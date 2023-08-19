@@ -27,7 +27,7 @@ __author__ = "Olivia Kinnear <contact@superatomic.dev>"
 
 from pathlib import Path
 from contextlib import suppress
-from os import remove
+from os import remove, getenv
 from functools import wraps
 
 import click
@@ -128,7 +128,11 @@ def subcommand_manpath(locales, page_sections):
     print(':'.join(unique(str(man_dir.parent) for man_dir in pages.get_dir_search_order(locales, page_sections))))
 
 
-@command(cls=HelpColorsCommand, help_headers_color='yellow', help_options_color='green', no_args_is_help=True)
+@command(cls=HelpColorsCommand,
+         help_headers_color='yellow',
+         help_options_color='green',
+         context_settings={'color': False if getenv('TLDR_MAN_NO_COLOR') or getenv('NO_COLOR') else None},
+         no_args_is_help=True)
 @argument('page', nargs=-1, required=True, shell_complete=page_shell_complete)
 @option('-p', '--platform',
         metavar='PLATFORM',

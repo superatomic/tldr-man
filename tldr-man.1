@@ -159,6 +159,9 @@ The location of the page cache directory. This directory is created by the
 command and is accessed by other commands.
 If this variable is not set or is not an absolute path, this defaults back to the value of
 .BR $XDG_CACHE_HOME/tldr-man .
+.TP
+.BR TLDR_MAN_NO_COLOR ", " NO_COLOR
+When present and not an empty string (regardless of its value), prevents the usage of ANSI color.
 .SH "FILES"
 .TP
 .BR $XDG_CACHE_HOME/tldr_man
@@ -182,6 +185,10 @@ TLDR\-Pages Client Specification
 .PP
 .UR https://standards.freedesktop.org/basedir-spec/basedir-spec-latest
 XDG Base Directory Specification
+.UE .
+.PP
+.UR https://no-color.org/
+NO_COLOR
 .UE .
 .SH "EXAMPLES"
 .PP
