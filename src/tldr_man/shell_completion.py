@@ -15,7 +15,7 @@
 """Rich shell completions for the client."""
 
 from click import Context, Parameter
-from click.shell_completion import CompletionItem, BashComplete
+from click.shell_completion import CompletionItem
 
 from tldr_man.pages import CACHE_DIR, get_dir_search_order
 from tldr_man.languages import get_locales, all_language_codes
