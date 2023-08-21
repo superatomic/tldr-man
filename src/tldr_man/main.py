@@ -181,3 +181,4 @@ def cli(locales, page_sections, page: list[str], **_):
 
 if __name__ == '__main__':
     cli()
+    #Thanks~ <3
