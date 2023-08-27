@@ -27,7 +27,7 @@ from typing import Optional
 from collections.abc import Iterable
 
 import requests
-from click import secho, progressbar, style, echo
+from click import style, echo, secho, progressbar, format_filename
 
 from tldr_man.util import mkstemp_path, mkdtemp_path, eprint, exit_with
 
@@ -237,13 +237,13 @@ def ensure_cache_dir_update_safety():
     if not CACHE_DIR.exists():
         return
 
-    problematic_files = ['  ' + str(path) + ('/' if path.is_dir() else '')
+    problematic_files = ['  ' + format_filename(path) + ('/' if path.is_dir() else '')
                          for path in sorted(CACHE_DIR.iterdir(), key=lambda path: (path.is_dir(), path.name))
                          if not (path.is_dir() and EXPECTED_CACHE_CONTENT_PATTERN.match(path.name))]
 
     if problematic_files:
         exit_with('\n\n'.join([
-            f"Error: Cache directory at {CACHE_DIR} contains non-cache files. Updating could cause data loss.",
+            f"Error: Cache directory at {format_filename(CACHE_DIR)} contains non-cache files. Updating could cause data loss.",
             '\n'.join([
                 "The following files would be removed:",
                 *problematic_files,
