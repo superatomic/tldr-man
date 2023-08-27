@@ -68,7 +68,7 @@
 ### Changed
 
 - Improve cache update speed ([#2](https://github.com/superatomic/tldr-man/issues/2))
-- Improve error message for the `--render` option when a directory or nonexistant file is provided ([`04bd41a`](https://github.com/superatomic/tldr-man/commit/04bd41aa17b05fbe516f0919c08819458d066f3a))
+- Improve error message for the `--render` option when a directory or nonexistent file is provided ([`04bd41a`](https://github.com/superatomic/tldr-man/commit/04bd41aa17b05fbe516f0919c08819458d066f3a))
 
 ## [1.0.3] - 2022-08-06
 
