@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.4.1] - 2023-08-27
+
+### Changed
+
+- Change error message for when the cache directory contains non-cache files ([`8342da2`](https://github.com/superatomic/tldr-man/commit/8342da2b019b22a618ecf4daeeb4e95d4103e471))
+
+### Fixed
+
+- Enable ANSI color when displaying help information when the environment variable `NO_COLOR` is an empty string ([click-contrib/click-help-colors#21](https://github.com/click-contrib/click-help-colors/pull/21), [`40aa283`](https://github.com/superatomic/tldr-man/commit/40aa283fa7a58008e03bf8caaa3b24fbe8e85bfc))
+- Ensure that filenames can be displayed in error messages by replacing any invalid bytes or surrogate escapes with a replacement character ([`9286a6e`](https://github.com/superatomic/tldr-man/commit/9286a6eddf5a96a616811e4d923fc8249dfdc95b))
+
 ## [1.4.0] - 2023-08-18
 
 ### Changed
@@ -92,6 +103,7 @@
 
 _First release._
 
+[1.4.1]: https://github.com/superatomic/tldr-man/compare/v1.4.0...v1.4.1
 [1.4.0]: https://github.com/superatomic/tldr-man/compare/v1.3.1...v1.4.0
 [1.3.1]: https://github.com/superatomic/tldr-man/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/superatomic/tldr-man/compare/v1.2.0...v1.3.0
