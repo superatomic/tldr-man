@@ -242,17 +242,15 @@ def ensure_cache_dir_update_safety():
                          if not (path.is_dir() and EXPECTED_CACHE_CONTENT_PATTERN.match(path.name))]
 
     if problematic_files:
-        exit_with('\n\n'.join([
-            f"Error: Cache directory at {format_filename(CACHE_DIR)} contains non-cache files. Updating could cause data loss.",
-            '\n'.join([
+        exit_with('\n'.join([
+                f"Error: Cache directory at {format_filename(CACHE_DIR)} contains non-cache files.",
+                "Updating could cause data loss and is a potentially destructive action.",
+                "",
                 "The following files would be removed:",
                 *problematic_files,
-            ]),
-            (
-                "To force an update, run the following command to delete the cache "
-                "(this action is potentially destructive!):\n"
-                f"  rm -r {shlex.quote(str(CACHE_DIR))}"
-            ),
+                "",
+                "To force an update, run the following command to delete the cache:",
+                f"  rm -r {shlex.quote(str(CACHE_DIR))}",
         ]))
 
 
