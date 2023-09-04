@@ -31,7 +31,7 @@ from os import remove, getenv
 from functools import wraps
 
 import click
-from click import Context, command, argument, option, version_option, help_option, pass_context
+from click import Context, command, argument, option, version_option, help_option, pass_context, echo
 from click_help_colors import HelpColorsCommand
 
 from tldr_man import pages
@@ -103,7 +103,7 @@ def subcommand_render(_ctx, value: Path):
 @standalone_subcommand
 @require_tldr_cache
 def subcommand_list(locales, page_sections):
-    print('\n'.join(unique(
+    echo('\n'.join(unique(
         page.stem
         for section in pages.get_dir_search_order(locales, page_sections)
         for page in section.iterdir()
@@ -114,7 +114,7 @@ def subcommand_list(locales, page_sections):
 @standalone_subcommand
 @require_tldr_cache
 def subcommand_manpath(locales, page_sections):
-    print(':'.join(unique(str(man_dir.parent) for man_dir in pages.get_dir_search_order(locales, page_sections))))
+    echo(':'.join(unique(str(man_dir.parent) for man_dir in pages.get_dir_search_order(locales, page_sections))))
 
 
 @command(cls=HelpColorsCommand,
