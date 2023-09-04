@@ -31,7 +31,7 @@ from click import style, echo, secho, progressbar, format_filename
 
 from tldr_man.color import style_command, style_path, style_url
 from tldr_man.errors import Fail, NoPageCache, ExternalCommandNotFound, PageNotFound, eprint
-from tldr_man.util import mkstemp_path, mkdtemp_path
+from tldr_man.temp_path import make_temp_file, make_temp_dir
 
 CACHE_DIR_NAME = 'tldr-man'
 
@@ -111,11 +111,11 @@ def update_cache() -> None:
 
     try:
         # Create a temporary file for the tldr-pages zip archive to generate manpages from.
-        zip_archive_location = mkstemp_path('tldr.zip')
+        zip_archive_location = make_temp_file('tldr.zip')
         download_archive(zip_archive_location)
 
         # Create the cache directory that will be copied to `~/.cache/tldr-man`.
-        temp_cache_dir = mkdtemp_path('tldr-man')
+        temp_cache_dir = make_temp_dir('tldr-man')
 
         # Get the zip file
         try:

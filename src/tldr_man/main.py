@@ -39,7 +39,7 @@ from tldr_man.color import HELP_COLORS
 from tldr_man.shell_completion import page_shell_complete, language_shell_complete
 from tldr_man.languages import get_locales
 from tldr_man.platforms import get_page_sections, TLDR_PLATFORMS
-from tldr_man.util import mkstemp_path
+from tldr_man.temp_path import make_temp_file
 
 
 def standalone_subcommand(func):
@@ -91,7 +91,7 @@ def subcommand_render(_ctx, value: Path):
     rendered_page = pages.render_manpage(page_to_render)
 
     try:
-        path = mkstemp_path('tldr-man', text=True)
+        path = make_temp_file('tldr-man', text=True)
         path.write_text(rendered_page)
         pages.display_page(path)
     finally:

@@ -12,15 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Various utility functions."""
+"""Wrappers around `mkstemp` and `mkdtemp` which return `pathlib.Path` objects."""
 
 from pathlib import Path
 from tempfile import mkstemp, mkdtemp
 
 
-def mkstemp_path(*args, **kwargs) -> Path:
+def make_temp_file(*args, **kwargs) -> Path:
     return Path(mkstemp(*args, **kwargs)[1])
 
 
-def mkdtemp_path(*args, **kwargs) -> Path:
+def make_temp_dir(*args, **kwargs) -> Path:
     return Path(mkdtemp(*args, **kwargs))
