@@ -39,7 +39,7 @@ from tldr_man.color import HELP_COLORS
 from tldr_man.shell_completion import page_shell_complete, language_shell_complete
 from tldr_man.languages import get_locales
 from tldr_man.platforms import get_page_sections, TLDR_PLATFORMS
-from tldr_man.util import unique, mkstemp_path
+from tldr_man.util import mkstemp_path
 
 
 def standalone_subcommand(func):
@@ -103,18 +103,18 @@ def subcommand_render(_ctx, value: Path):
 @standalone_subcommand
 @require_tldr_cache
 def subcommand_list(locales, page_sections):
-    echo('\n'.join(unique(
+    echo('\n'.join(
         page.stem
         for section in pages.get_dir_search_order(locales, page_sections)
         for page in section.iterdir()
         if page.is_file()
-    )))
+    ))
 
 
 @standalone_subcommand
 @require_tldr_cache
 def subcommand_manpath(locales, page_sections):
-    echo(':'.join(unique(str(man_dir.parent) for man_dir in pages.get_dir_search_order(locales, page_sections))))
+    echo(':'.join(str(man_dir.parent) for man_dir in pages.get_dir_search_order(locales, page_sections)))
 
 
 @command(cls=HelpColorsCommand,

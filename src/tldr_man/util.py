@@ -16,18 +16,6 @@
 
 from pathlib import Path
 from tempfile import mkstemp, mkdtemp
-from typing import TypeVar
-from collections.abc import Iterable, Iterator, Hashable
-
-
-T = TypeVar('T', bound=Hashable)
-
-def unique(items: Iterable[T]) -> Iterator[T]:
-    seen = set()
-    for item in items:
-        if item not in seen:
-            seen.add(item)
-            yield item
 
 
 def mkstemp_path(*args, **kwargs) -> Path:

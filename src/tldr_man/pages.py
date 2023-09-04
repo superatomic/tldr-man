@@ -23,8 +23,8 @@ from pathlib import Path
 from os import remove, makedirs, getenv
 from shutil import rmtree, move
 from subprocess import run, PIPE, DEVNULL
-from typing import Optional
-from collections.abc import Iterable
+from typing import Optional, TypeVar
+from collections.abc import Iterable, Iterator, Hashable
 
 import requests
 from click import style, echo, secho, progressbar, format_filename
@@ -315,8 +315,18 @@ def find_page(page_name: str, /, locales: Iterable[str], page_sections: Iterable
         raise PageNotFound(page_name)
 
 
-def get_dir_search_order(locales: Iterable[str], page_sections: Iterable[str]) -> Iterable[Path]:
-    return (
+T = TypeVar('T', bound=Hashable)
+
+def unique(items: Iterable[T]) -> Iterator[T]:
+    seen = set()
+    for item in items:
+        if item not in seen:
+            seen.add(item)
+            yield item
+
+
+def get_dir_search_order(locales: Iterable[str], page_sections: Iterable[str]) -> Iterator[Path]:
+    return unique(
         CACHE_DIR / locale / section / ('man' + MANPAGE_SECTION)
         for locale in locales
         for section in page_sections
