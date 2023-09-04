@@ -19,6 +19,9 @@ from functools import partial
 from click import style
 
 
+HELP_COLORS = dict(help_headers_color='yellow', help_options_color='green')
+
+
 style_command = partial(style, fg='cyan', bold=True)
 style_error = partial(style, fg='red', bold=True)
 style_input = partial(style, fg='yellow')
