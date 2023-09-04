@@ -29,7 +29,9 @@ from collections.abc import Iterable
 import requests
 from click import style, echo, secho, progressbar, format_filename
 
-from tldr_man.util import mkstemp_path, mkdtemp_path, eprint, exit_with
+from tldr_man.color import style_command, style_path, style_url
+from tldr_man.errors import Fail, NoPageCache, ExternalCommandNotFound, PageNotFound, eprint
+from tldr_man.util import mkstemp_path, mkdtemp_path
 
 CACHE_DIR_NAME = 'tldr-man'
 
@@ -53,28 +55,14 @@ MANPAGE_HEADER = f"""
 
 """[1:-1]
 
-PANDOC_MISSING_MESSAGE = """
-Error: Couldn't find the `pandoc` command.
+PANDOC_MISSING_MESSAGE = f"""
 Make sure that pandoc is installed and on your PATH.
-    Installation instructions: https://pandoc.org/installing.html
+  Installation instructions: {style_url('https://pandoc.org/installing.html')}
 """[1:-1]
 
-MANPAGE_MISSING_MESSAGE = """
-Error: Couldn't find the `man` command.
-Make sure that `man` is on your PATH.
-"""[1:-1]
-
-PAGE_NOT_FOUND_MESSAGE = """
-Error: Page `{page_name}` is not found.
-    Try running `tldr --update` to update the tldr-pages cache.
-
-Request this page here:
-    https://github.com/tldr-pages/tldr/issues/new?title=page%20request:%20{page_name}
-"""[1:-1]
-
-CACHE_DOES_NOT_EXIST_MESSAGE = """
-The tldr-pages cache needs to be generated before `tldr` can be used.
-    Run `tldr --update` to generate the cache.
+CACHE_DOES_NOT_EXIST_MESSAGE = f"""
+The tldr-pages cache needs to be generated before {style_command('tldr')} can be used.
+  Run {style_command('tldr --update')} to generate the cache.
 """[1:-1]
 
 
@@ -99,11 +87,11 @@ def download_archive(location: Path, url: str = ZIP_ARCHIVE_URL) -> None:
     try:
         r = requests.get(url, timeout=10)
     except requests.ConnectionError:
-        exit_with(f"Error: Could not make connection to {url}")
+        raise Fail(f"Could not make connection to {style_url(url)}")
     except requests.Timeout:
-        exit_with(f"Error: Request to {url} timed out")
+        raise Fail(f"Request to {style_url(url)} timed out")
     except requests.RequestException:
-        eprint(f"The following error occurred when trying to access {url}:")
+        eprint(f"The following error occurred when trying to access {style_url(url)}:")
         raise
     else:
         location.write_bytes(r.content)
@@ -113,7 +101,7 @@ def update_cache() -> None:
     """Updates the tldr-pages manpage cache."""
 
     if not pandoc_exists():
-        exit_with(PANDOC_MISSING_MESSAGE, exitcode=127)
+        raise ExternalCommandNotFound('pandoc', PANDOC_MISSING_MESSAGE)
 
     ensure_cache_dir_update_safety()
 
@@ -133,8 +121,7 @@ def update_cache() -> None:
         try:
             zip_path = zipfile.Path(zip_archive_location)
         except zipfile.BadZipFile:
-            eprint(f"Error: Got a bad zipfile from {ZIP_ARCHIVE_URL}")
-            raise
+            raise Fail(f"Got a bad zipfile from {style_url(ZIP_ARCHIVE_URL)}")
 
         # Iterate through each language and section in the zip file.
         for language_dir in zip_path.iterdir():
@@ -242,15 +229,15 @@ def ensure_cache_dir_update_safety():
                          if not (path.is_dir() and EXPECTED_CACHE_CONTENT_PATTERN.match(path.name))]
 
     if problematic_files:
-        exit_with('\n'.join([
-                f"Error: Cache directory at {format_filename(CACHE_DIR)} contains non-cache files.",
+        raise Fail('\n'.join([
+                f"Cache directory at {style_path(format_filename(CACHE_DIR))} contains non-cache files.",
                 "Updating could cause data loss and is a potentially destructive action.",
                 "",
                 "The following files would be removed:",
                 *problematic_files,
                 "",
                 "To force an update, run the following command to delete the cache:",
-                f"  rm -r {shlex.quote(str(CACHE_DIR))}",
+                style_command(f"  rm -r {shlex.quote(str(CACHE_DIR))}"),
         ]))
 
 
@@ -291,7 +278,7 @@ def render_manpage(tldr_page: str) -> str:
         return run(['pandoc', '-', '-s', '-t', 'man', '-f', 'markdown-tex_math_dollars-smart'],
                    input=res, stdout=PIPE, encoding="utf-8").stdout
     except FileNotFoundError:
-        exit_with(PANDOC_MISSING_MESSAGE, exitcode=127)
+        raise ExternalCommandNotFound('pandoc', PANDOC_MISSING_MESSAGE)
 
 
 def pandoc_exists() -> bool:
@@ -305,7 +292,7 @@ def pandoc_exists() -> bool:
 def verify_tldr_cache_exists():
     """Display a specific message if the tldr manpage cache doesn't exist yet, and then exit."""
     if not CACHE_DIR.exists():
-        exit_with(CACHE_DOES_NOT_EXIST_MESSAGE, exitcode=3)
+        raise NoPageCache(CACHE_DOES_NOT_EXIST_MESSAGE)
 
 
 def display_page(page: Path) -> None:
@@ -313,19 +300,19 @@ def display_page(page: Path) -> None:
         run(['man', page])
     except FileNotFoundError as err:
         if err.filename == 'man':
-            exit_with(MANPAGE_MISSING_MESSAGE, exitcode=127)
+            raise ExternalCommandNotFound('man', 'Make sure that man is on your PATH.')
         else:
             raise
 
 
-def find_page(page_name: str, /, locales: Iterable[str], page_sections: Iterable[str]) -> Optional[Path]:
+def find_page(page_name: str, /, locales: Iterable[str], page_sections: Iterable[str]) -> Path:
     for search_dir in get_dir_search_order(locales, page_sections):
         page = search_dir / (page_name + '.' + MANPAGE_SECTION)
 
         if page.exists():
             return page
     else:
-        exit_with(PAGE_NOT_FOUND_MESSAGE.format(page_name=page_name))
+        raise PageNotFound(page_name)
 
 
 def get_dir_search_order(locales: Iterable[str], page_sections: Iterable[str]) -> Iterable[Path]:

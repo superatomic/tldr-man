@@ -48,23 +48,11 @@ def standalone_subcommand(func):
         if not value or ctx.resilient_parsing:
             return
 
-        exited_with_error = False
-        # noinspection PyBroadException
+        exited_with_error = True
         try:
-            return func(ctx, value) if value is not True else func(ctx)
-        except Exception:
-            from traceback import format_exc
-            from sys import stderr
-
-            print(format_exc(), file=stderr)
-            exited_with_error = True  # Don't call the `ctx.exit()` in the `finally` block
-            ctx.exit(1)
-        except SystemExit as err:
-            # If `sys.exit()` was called, exit that context with the given status code.
-            exited_with_error = True  # Don't call the `ctx.exit()` in the `finally` block
-            ctx.exit(err.code)
+            func(ctx, value) if value is not True else func(ctx)
+            exited_with_error = False
         except KeyboardInterrupt:
-            exited_with_error = True
             ctx.exit(130)
         finally:
             if not exited_with_error:
@@ -175,8 +163,7 @@ def cli(locales, page_sections, page: list[str], **_):
 
     page_path = pages.find_page(page_name, locales, page_sections)
 
-    if page_path is not None:
-        pages.display_page(page_path)
+    pages.display_page(page_path)
 
 
 if __name__ == '__main__':

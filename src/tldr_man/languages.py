@@ -19,8 +19,9 @@ from collections.abc import Iterator
 
 from click import Context
 
+from tldr_man.color import style_input
+from tldr_man.errors import Fail
 from tldr_man.pages import CACHE_DIR, language_directory_to_code
-from tldr_man.util import exit_with
 
 
 def all_languages() -> Iterator[str]:
@@ -95,7 +96,7 @@ def get_locales(ctx: Context) -> list[str]:
     if language is not None:
         page_locale = get_language_directory(language)
         if page_locale not in all_languages():
-            exit_with(f"Unrecognized locale: {language}")
+            raise Fail(f"Unrecognized locale: {style_input(language)}")
         else:
             return [page_locale]
     else:

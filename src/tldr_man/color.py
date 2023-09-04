@@ -12,27 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Various utility functions."""
+"""Color and styling utilities for output."""
 
-from pathlib import Path
-from tempfile import mkstemp, mkdtemp
-from typing import TypeVar
-from collections.abc import Iterable, Iterator, Hashable
+from functools import partial
 
-
-T = TypeVar('T', bound=Hashable)
-
-def unique(items: Iterable[T]) -> Iterator[T]:
-    seen = set()
-    for item in items:
-        if item not in seen:
-            seen.add(item)
-            yield item
+from click import style
 
 
-def mkstemp_path(*args, **kwargs) -> Path:
-    return Path(mkstemp(*args, **kwargs)[1])
-
-
-def mkdtemp_path(*args, **kwargs) -> Path:
-    return Path(mkdtemp(*args, **kwargs))
+style_command = partial(style, fg='cyan', bold=True)
+style_error = partial(style, fg='red', bold=True)
+style_input = partial(style, fg='yellow')
+style_path = partial(style, fg='blue', italic=True)
+style_url = partial(style, underline=True)
