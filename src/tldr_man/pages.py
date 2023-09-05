@@ -218,7 +218,7 @@ def update_cache() -> None:
 EXPECTED_CACHE_CONTENT_PATTERN = re.compile(r'^pages(?:\.\w{2}(?:_\w{2})?)?$')
 
 
-def ensure_cache_dir_update_safety():
+def ensure_cache_dir_update_safety() -> None:
     """Make sure not to overwrite directories with user data in them."""
 
     if not CACHE_DIR.exists():
@@ -230,14 +230,14 @@ def ensure_cache_dir_update_safety():
 
     if problematic_files:
         raise Fail('\n'.join([
-                f"Cache directory at {style_path(format_filename(CACHE_DIR))} contains non-cache files.",
-                "Updating could cause data loss and is a potentially destructive action.",
-                "",
-                "The following files would be removed:",
-                *problematic_files,
-                "",
-                "To force an update, run the following command to delete the cache:",
-                style_command(f"  rm -r {shlex.quote(str(CACHE_DIR))}"),
+            f"Cache directory at {style_path(format_filename(CACHE_DIR))} contains non-cache files.",
+            "Updating could cause data loss and is a potentially destructive action.",
+            "",
+            "The following files would be removed:",
+            *problematic_files,
+            "",
+            "To force an update, run the following command to delete the cache:",
+            style_command(f"  rm -r {shlex.quote(str(CACHE_DIR))}"),
         ]))
 
 
