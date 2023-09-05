@@ -119,7 +119,9 @@ def subcommand_manpath(locales, page_sections):
 
 @command(cls=HelpColorsCommand,
          **HELP_COLORS,
-         context_settings={'color': False if getenv('TLDR_MAN_NO_COLOR') or getenv('NO_COLOR') else None},
+         context_settings={
+             'color': False if getenv('TERM') == 'dumb' or getenv('TLDR_MAN_NO_COLOR') or getenv('NO_COLOR') else None,
+         },
          no_args_is_help=True)
 @argument('page', nargs=-1, required=True, shell_complete=page_shell_complete)
 @option('-p', '--platform',
