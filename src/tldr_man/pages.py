@@ -225,7 +225,7 @@ def ensure_cache_dir_update_safety():
         return
 
     problematic_files = ['  ' + format_filename(path) + ('/' if path.is_dir() else '')
-                         for path in sorted(CACHE_DIR.iterdir(), key=lambda path: (path.is_dir(), path.name))
+                         for path in sorted(CACHE_DIR.iterdir(), key=lambda path: (path.is_file(), path.name))
                          if not (path.is_dir() and EXPECTED_CACHE_CONTENT_PATTERN.match(path.name))]
 
     if problematic_files:
