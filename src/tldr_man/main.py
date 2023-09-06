@@ -26,8 +26,7 @@ or visit the project repository at https://github.com/superatomic/tldr-man.
 __author__ = "Olivia Kinnear <contact@superatomic.dev>"
 
 from pathlib import Path
-from contextlib import suppress
-from os import remove, getenv
+from os import getenv
 from functools import wraps
 
 import click
@@ -39,7 +38,7 @@ from tldr_man.color import HELP_COLORS
 from tldr_man.shell_completion import page_shell_complete, language_shell_complete
 from tldr_man.languages import get_locales
 from tldr_man.platforms import get_page_sections, TLDR_PLATFORMS
-from tldr_man.temp_path import make_temp_file
+from tldr_man.temp_path import temp_file
 
 
 def standalone_subcommand(func):
@@ -90,14 +89,9 @@ def subcommand_render(_ctx, value: Path):
     page_to_render = value.read_text()
     rendered_page = pages.render_manpage(page_to_render)
 
-    try:
-        path = make_temp_file('tldr-man', text=True)
-        path.write_text(rendered_page)
-        pages.display_page(path)
-    finally:
-        with suppress(NameError, FileNotFoundError):
-            # noinspection PyUnboundLocalVariable
-            remove(path)
+    with temp_file('.1', text=True) as page_path:
+        page_path.write_text(rendered_page)
+        pages.display_page(page_path)
 
 
 @standalone_subcommand

@@ -12,15 +12,32 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Wrappers around `mkstemp` and `mkdtemp` which return `pathlib.Path` objects."""
+"""Context manager wrappers around `mkstemp` and `mkdtemp` which yield `pathlib.Path` objects."""
 
+from collections.abc import Iterator
+from contextlib import contextmanager, suppress
+from os import remove
 from pathlib import Path
+from shutil import rmtree
 from tempfile import mkstemp, mkdtemp
+from typing import Any
 
 
-def make_temp_file(*args, **kwargs) -> Path:
-    return Path(mkstemp(*args, **kwargs)[1])
+@contextmanager
+def temp_file(*args: Any, **kwargs: Any) -> Iterator[Path]:
+    try:
+        yield Path(file := mkstemp(*args, **kwargs)[1])
+    finally:
+        with suppress(NameError, FileNotFoundError):
+            # noinspection PyUnboundLocalVariable
+            remove(file)
 
 
-def make_temp_dir(*args, **kwargs) -> Path:
-    return Path(mkdtemp(*args, **kwargs))
+@contextmanager
+def temp_dir(*args: Any, **kwargs: Any) -> Iterator[Path]:
+    try:
+        yield Path(directory := mkdtemp(*args, **kwargs))
+    finally:
+        with suppress(NameError, FileNotFoundError):
+            # noinspection PyUnboundLocalVariable
+            rmtree(directory)

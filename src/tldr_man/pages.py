@@ -20,7 +20,7 @@ import zipfile
 from concurrent.futures import ThreadPoolExecutor
 from contextlib import suppress
 from pathlib import Path
-from os import remove, makedirs, getenv
+from os import makedirs, getenv
 from shutil import rmtree, move
 from subprocess import run, PIPE, DEVNULL
 from typing import Optional, TypeVar
@@ -31,7 +31,7 @@ from click import style, echo, secho, progressbar, format_filename
 
 from tldr_man.color import style_command, style_path, style_url
 from tldr_man.errors import Fail, NoPageCache, ExternalCommandNotFound, PageNotFound, eprint
-from tldr_man.temp_path import make_temp_file, make_temp_dir
+from tldr_man.temp_path import temp_file, temp_dir
 
 CACHE_DIR_NAME = 'tldr-man'
 
@@ -109,15 +109,10 @@ def update_cache() -> None:
 
     created, updated, unchanged = 0, 0, 0
 
-    try:
-        # Create a temporary file for the tldr-pages zip archive to generate manpages from.
-        zip_archive_location = make_temp_file('tldr.zip')
-        download_archive(zip_archive_location)
-
-        # Create the cache directory that will be copied to `~/.cache/tldr-man`.
-        temp_cache_dir = make_temp_dir('tldr-man')
+    with temp_file('tldr.zip') as zip_archive_location, temp_dir('tldr-man') as temp_cache_dir:
 
         # Get the zip file
+        download_archive(zip_archive_location)
         try:
             zip_path = zipfile.Path(zip_archive_location)
         except zipfile.BadZipFile:
@@ -196,15 +191,6 @@ def update_cache() -> None:
 
         makedirs(CACHE_DIR.parent, exist_ok=True)
         move(temp_cache_dir, CACHE_DIR)
-
-    finally:
-        # Clean up any temporary files that aren't gone.
-        with suppress(NameError, FileNotFoundError):
-            # noinspection PyUnboundLocalVariable
-            remove(zip_archive_location)
-        with suppress(NameError, FileNotFoundError):
-            # noinspection PyUnboundLocalVariable
-            rmtree(temp_cache_dir)
 
     # Display the details for the cache update:
     echo(', '.join([
