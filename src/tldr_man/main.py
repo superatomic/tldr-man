@@ -28,9 +28,12 @@ __author__ = "Olivia Kinnear <contact@superatomic.dev>"
 from pathlib import Path
 from os import getenv
 from functools import wraps
+from typing import Any, ParamSpec, TypeVar, Concatenate
+from collections.abc import Callable
 
 import click
-from click import Context, command, argument, option, version_option, help_option, pass_context, echo
+from click import Parameter, Context, command, argument, option, version_option, help_option, get_current_context, echo
+from click.decorators import FC
 from click_help_colors import HelpColorsCommand
 
 from tldr_man import pages
@@ -41,51 +44,65 @@ from tldr_man.platforms import get_page_sections, TLDR_PLATFORMS
 from tldr_man.temp_path import temp_file
 
 
-def standalone_subcommand(func):
-    """Function decorator to reduce boilerplate code at the start and end of all subcommand callback functions."""
-    @wraps(func)
-    def wrapper(ctx: Context, _param, value):
-        if not value or ctx.resilient_parsing:
-            return
+def subcommand(*param_decls: str, **attrs: Any) -> Callable[[Callable[..., None]], Callable[[FC], FC]]:
+    """Transform a function into a `click.option()` decorator with a callback to the function."""
+    def decorator(func: Callable[..., None]) -> Callable[[FC], FC]:
+        @wraps(func)
+        def wrapper(ctx: Context, _param: Parameter, value: Any) -> None:
+            if not value or ctx.resilient_parsing:
+                return
 
-        exited_with_error = True
-        try:
-            func(ctx, value) if value is not True else func(ctx)
-            exited_with_error = False
-        except KeyboardInterrupt:
-            ctx.exit(130)
-        finally:
-            if not exited_with_error:
+            try:
+                func(value) if value is not True else func()
+            except KeyboardInterrupt:
+                ctx.exit(130)
+            else:
                 ctx.exit()
 
-    return wrapper
+        return option(
+            *param_decls,
+            callback=wrapper,
+            expose_value=False,
+            is_flag=True if attrs.get('type') is None else attrs.get('is_flag'),
+            help=func.__doc__,
+            **attrs,
+        )
 
-def require_tldr_cache(func):
+    return decorator
+
+
+P = ParamSpec('P')
+T = TypeVar('T')
+
+def require_tldr_cache(func: Callable[Concatenate[list[str], list[str], P], T]) -> Callable[P, T]:
     """
     Function decorator to mark that a subcommand requires the tldr-page cache to exist.
     Additionally, maps `ctx` into the valid locales and platforms.
 
-    func(locales, platforms, ...) --> func(ctx, ...)
+    func(locales, platforms, ...) --> func(...)
     """
     @wraps(func)
-    def wrapper(ctx: Context, *args, **kwargs):
+    def wrapper(*args: P.args, **kwargs: P.kwargs) -> T:
         pages.verify_tldr_cache_exists()
 
-        locales: list[str] = get_locales(ctx)
-        page_sections: list[str] = get_page_sections(ctx)
+        ctx = get_current_context()
+        locales = get_locales(ctx)
+        page_sections = get_page_sections(ctx)
 
         return func(locales, page_sections, *args, **kwargs)
 
     return wrapper
 
 
-@standalone_subcommand
-def subcommand_update(_ctx):
+@subcommand('-u', '--update', is_eager=True)
+def subcommand_update() -> None:
+    """Update the tldr-pages cache"""
     pages.update_cache()
 
 
-@standalone_subcommand
-def subcommand_render(_ctx, value: Path):
+@subcommand('-r', '--render', type=click.Path(exists=True, dir_okay=False, path_type=Path), is_eager=True)
+def subcommand_render(value: Path) -> None:
+    """Render a page locally"""
     page_to_render = value.read_text()
     rendered_page = pages.render_manpage(page_to_render)
 
@@ -94,9 +111,10 @@ def subcommand_render(_ctx, value: Path):
         pages.display_page(page_path)
 
 
-@standalone_subcommand
+@subcommand('-l', '--list')
 @require_tldr_cache
-def subcommand_list(locales, page_sections):
+def subcommand_list(locales: list[str], page_sections: list[str]) -> None:
+    """List all the pages for the current platform"""
     echo('\n'.join(
         page.stem
         for section in pages.get_dir_search_order(locales, page_sections)
@@ -105,9 +123,10 @@ def subcommand_list(locales, page_sections):
     ))
 
 
-@standalone_subcommand
+@subcommand('-M', '--manpath')
 @require_tldr_cache
-def subcommand_manpath(locales, page_sections):
+def subcommand_manpath(locales: list[str], page_sections: list[str]) -> None:
+    """Print the paths to the tldr manpages"""
     echo(':'.join(str(man_dir.parent) for man_dir in pages.get_dir_search_order(locales, page_sections)))
 
 
@@ -121,44 +140,30 @@ def subcommand_manpath(locales, page_sections):
 @option('-p', '--platform',
         metavar='PLATFORM',
         type=click.Choice(TLDR_PLATFORMS),
+        expose_value=False,
         is_eager=True,
         help='Override the preferred platform')
 @option('-L', '--language',
         metavar='LANGUAGE',
+        type=str,
+        expose_value=False,
         is_eager=True,
         shell_complete=language_shell_complete,
         help='Specify a preferred language')
-@option('-u', '--update',
-        callback=subcommand_update, expose_value=False,
-        is_flag=True,
-        is_eager=True,
-        help='Update the tldr-pages cache')
-@option('-r', '--render',
-        callback=subcommand_render, expose_value=False,
-        type=click.Path(exists=True, dir_okay=False, path_type=Path), nargs=1,
-        is_eager=True,
-        help='Render a page locally')
-@option('-l', '--list',
-        callback=subcommand_list, expose_value=False,
-        is_flag=True,
-        help='List all the pages for the current platform')
-@option('-M', '--manpath',
-        callback=subcommand_manpath, expose_value=False,
-        is_flag=True,
-        help='Print the paths to the tldr manpages')
+@subcommand_update
+@subcommand_render
+@subcommand_list
+@subcommand_manpath
 @version_option(None, '-v', '-V', '--version',
                 message="%(prog)s %(version)s",
                 help='Display the version and exit')
 @help_option('-h', '--help',
              help='Show this message and exit')
-@pass_context
 @require_tldr_cache
-def cli(locales, page_sections, page: list[str], **_):
+def cli(locales: list[str], page_sections: list[str], page: list[str]) -> None:
     """TLDR client that displays tldr-pages as manpages"""
     page_name = '-'.join(page).strip().lower()
-
     page_path = pages.find_page(page_name, locales, page_sections)
-
     pages.display_page(page_path)
 
 
