@@ -97,6 +97,13 @@ def download_archive(location: Path, url: str = ZIP_ARCHIVE_URL) -> None:
         location.write_bytes(r.content)
 
 
+AnyPath = TypeVar('AnyPath', Path, zipfile.Path)
+
+
+def iter_dirs(path: AnyPath) -> Iterator[AnyPath]:
+    return filter(lambda p: p.is_dir(), path.iterdir())
+
+
 def update_cache() -> None:
     """Updates the tldr-pages manpage cache."""
 
@@ -119,10 +126,8 @@ def update_cache() -> None:
             raise Fail(f"Got a bad zipfile from {style_url(ZIP_ARCHIVE_URL)}")
 
         # Iterate through each language and section in the zip file.
-        for language_dir in zip_path.iterdir():
-            if not language_dir.is_dir():
-                continue
-            for sections_dir in language_dir.iterdir():
+        for language_dir in iter_dirs(zip_path):
+            for sections_dir in iter_dirs(language_dir):
                 # Get the full path to the directory where all manpages for this language and section will be extracted.
                 res_dir = temp_cache_dir / language_dir.name / sections_dir.name / ('man' + MANPAGE_SECTION)
                 res_dir.mkdir(parents=True, exist_ok=True)  # Create the directories if they don't exist.

@@ -21,7 +21,7 @@ from click import Context
 
 from tldr_man.color import style_input
 from tldr_man.errors import Fail
-from tldr_man.pages import CACHE_DIR, language_directory_to_code
+from tldr_man.pages import CACHE_DIR, language_directory_to_code, iter_dirs
 
 
 def all_languages() -> Iterator[str]:
@@ -33,8 +33,7 @@ def all_language_codes() -> Iterator[str]:
     """Returns an iterator of all language codes, based on all language directories."""
     return (
         language_directory_to_code(pages_dir)
-        for pages_dir in CACHE_DIR.iterdir()
-        if pages_dir.is_dir()
+        for pages_dir in iter_dirs(CACHE_DIR)
     )
 
 
