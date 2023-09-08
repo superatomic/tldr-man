@@ -94,13 +94,13 @@ def require_tldr_cache(func: Callable[Concatenate[list[str], list[str], P], T]) 
     return wrapper
 
 
-@subcommand('-u', '--update', is_eager=True)
+@subcommand('-u', '--update')
 def subcommand_update() -> None:
     """Update the tldr-pages cache"""
     pages.update_cache()
 
 
-@subcommand('-r', '--render', type=click.Path(exists=True, dir_okay=False, path_type=Path), is_eager=True)
+@subcommand('-r', '--render', type=click.Path(exists=True, dir_okay=False, path_type=Path))
 def subcommand_render(value: Path) -> None:
     """Render a page locally"""
     page_to_render = value.read_text()
