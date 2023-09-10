@@ -28,6 +28,7 @@ from collections.abc import Iterable, Iterator, Hashable
 
 import requests
 from click import style, echo, secho, progressbar, format_filename
+from filelock import FileLock
 
 from tldr_man.color import style_command, style_path, style_url
 from tldr_man.errors import Fail, NoPageCache, ExternalCommandNotFound, PageNotFound, eprint
@@ -79,6 +80,7 @@ def get_cache_dir() -> Path:
 
 
 CACHE_DIR: Path = get_cache_dir()
+cache_dir_lock = FileLock(CACHE_DIR.parent / f'.{CACHE_DIR.name}.lock', timeout=2)
 
 
 def download_archive(location: Path, url: str = ZIP_ARCHIVE_URL) -> None:
@@ -172,12 +174,13 @@ def update_cache() -> None:
                             res_file.write_text(manpage)
 
                             # Log whether the file was created, updated, or unchanged:
-                            if original_dir is None or not (original_file := original_dir / filename).exists():
-                                created += 1
-                            elif original_file.read_text() != manpage:
-                                updated += 1
-                            else:
-                                unchanged += 1
+                            with cache_dir_lock:
+                                if original_dir is None or not (original_file := original_dir / filename).exists():
+                                    created += 1
+                                elif original_file.read_text() != manpage:
+                                    updated += 1
+                                else:
+                                    unchanged += 1
                     except:
                         # If an exception occurs, such as a KeyboardInterrupt or an actual Exception,
                         # shutdown the pool *without* waiting for any remaining futures to finish. This will prevent the
@@ -190,12 +193,13 @@ def update_cache() -> None:
         # Now that the updated cache has been generated, remove the old cache, make sure the parent directory exists,
         # and move the new cache into the correct directory from the temporary directory.
 
-        ensure_cache_dir_update_safety()
-        with suppress(FileNotFoundError):
-            rmtree(CACHE_DIR)
+        with cache_dir_lock:
+            ensure_cache_dir_update_safety()
+            with suppress(FileNotFoundError):
+                rmtree(CACHE_DIR)
 
-        makedirs(CACHE_DIR.parent, exist_ok=True)
-        move(temp_cache_dir, CACHE_DIR)
+            makedirs(CACHE_DIR.parent, exist_ok=True)
+            move(temp_cache_dir, CACHE_DIR)
 
     # Display the details for the cache update:
     echo(', '.join([
@@ -209,6 +213,7 @@ def update_cache() -> None:
 EXPECTED_CACHE_CONTENT_PATTERN = re.compile(r'^pages(?:\.\w{2}(?:_\w{2})?)?$')
 
 
+@cache_dir_lock
 def ensure_cache_dir_update_safety() -> None:
     """Make sure not to overwrite directories with user data in them."""
 
@@ -280,6 +285,7 @@ def pandoc_exists() -> bool:
         return False
 
 
+@cache_dir_lock
 def verify_tldr_cache_exists() -> None:
     """Display a specific message if the tldr manpage cache doesn't exist yet, and then exit."""
     if not CACHE_DIR.exists():
@@ -296,6 +302,7 @@ def display_page(page: Path) -> None:
             raise
 
 
+@cache_dir_lock
 def find_page(page_name: str, /, locales: Iterable[str], page_sections: Iterable[str]) -> Path:
     for search_dir in get_dir_search_order(locales, page_sections):
         page = search_dir / (page_name + '.' + MANPAGE_SECTION)
@@ -316,6 +323,7 @@ def unique(items: Iterable[T]) -> Iterator[T]:
             yield item
 
 
+@cache_dir_lock
 def get_dir_search_order(locales: Iterable[str], page_sections: Iterable[str]) -> Iterator[Path]:
     return unique(
         CACHE_DIR / locale / section / ('man' + MANPAGE_SECTION)

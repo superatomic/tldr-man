@@ -21,14 +21,16 @@ from click import Context
 
 from tldr_man.color import style_input
 from tldr_man.errors import Fail
-from tldr_man.pages import CACHE_DIR, language_directory_to_code, iter_dirs
+from tldr_man.pages import CACHE_DIR, cache_dir_lock, language_directory_to_code, iter_dirs
 
 
+@cache_dir_lock
 def all_languages() -> Iterator[str]:
     """Returns an iterator of all languages directory names."""
     return map(get_language_directory, all_language_codes())
 
 
+@cache_dir_lock
 def all_language_codes() -> Iterator[str]:
     """Returns an iterator of all language codes, based on all language directories."""
     return (
@@ -76,6 +78,7 @@ def _language_code_as_parts(language_code: str) -> tuple[str, str]:
     return language, region
 
 
+@cache_dir_lock
 def get_language_directory(language_code: str) -> str:
     """Get the name of the directory for a language code."""
     language, region = _language_code_as_parts(language_code)
@@ -89,6 +92,7 @@ def get_language_directory(language_code: str) -> str:
             return f'pages.{language}'
 
 
+@cache_dir_lock
 def get_locales(ctx: Context) -> list[str]:
     """Return an ordered list of the languages that the user specifies."""
     language = ctx.params.get('language')

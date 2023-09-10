@@ -38,6 +38,7 @@ from click_help_colors import HelpColorsCommand
 
 from tldr_man import pages
 from tldr_man.color import HELP_COLORS
+from tldr_man.pages import cache_dir_lock
 from tldr_man.shell_completion import page_shell_complete, language_shell_complete
 from tldr_man.languages import get_locales
 from tldr_man.platforms import get_page_sections, TLDR_PLATFORMS
@@ -82,6 +83,7 @@ def require_tldr_cache(func: Callable[Concatenate[list[str], list[str], P], T]) 
     func(locales, platforms, ...) --> func(...)
     """
     @wraps(func)
+    @cache_dir_lock
     def wrapper(*args: P.args, **kwargs: P.kwargs) -> T:
         pages.verify_tldr_cache_exists()
 
@@ -163,8 +165,11 @@ def subcommand_manpath(locales: list[str], page_sections: list[str]) -> None:
 def cli(locales: list[str], page_sections: list[str], page: list[str]) -> None:
     """TLDR client that displays tldr-pages as manpages"""
     page_name = '-'.join(page).strip().lower()
-    page_path = pages.find_page(page_name, locales, page_sections)
-    pages.display_page(page_path)
+    page_file = pages.find_page(page_name, locales, page_sections)
+    with temp_file(page_file.name) as temp_page_file:
+        temp_page_file.write_bytes(page_file.read_bytes())
+        cache_dir_lock.release(force=True)
+        pages.display_page(temp_page_file)
 
 
 if __name__ == '__main__':

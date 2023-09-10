@@ -17,11 +17,12 @@
 from click import Context, Parameter
 from click.shell_completion import CompletionItem
 
-from tldr_man.pages import CACHE_DIR, get_dir_search_order
+from tldr_man.pages import CACHE_DIR, cache_dir_lock, get_dir_search_order
 from tldr_man.languages import get_locales, all_language_codes
 from tldr_man.platforms import get_page_sections
 
 
+@cache_dir_lock
 def page_shell_complete(ctx: Context, param: Parameter, incomplete: str) -> list[CompletionItem]:
     if not CACHE_DIR.exists() or param.name is None: # the `param.name is None` check makes the type checker happy
         return []
@@ -40,6 +41,7 @@ def page_shell_complete(ctx: Context, param: Parameter, incomplete: str) -> list
     ]
 
 
+@cache_dir_lock
 def language_shell_complete(_ctx: Context, _param: Parameter, _incomplete: str) -> list[CompletionItem]:
     if not CACHE_DIR.exists():
         return []
