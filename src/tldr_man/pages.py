@@ -21,7 +21,7 @@ from concurrent.futures import ThreadPoolExecutor
 from contextlib import suppress
 from pathlib import Path
 from os import makedirs, getenv
-from shutil import rmtree, move
+from shutil import rmtree, move, which
 from subprocess import run, PIPE, DEVNULL
 from typing import Optional, TypeVar
 from collections.abc import Iterable, Iterator, Hashable
@@ -237,6 +237,9 @@ def ensure_cache_dir_update_safety() -> None:
         ]))
 
 
+PANDOC_LOCATION: Optional[str] = which('pandoc')
+
+
 def render_manpage(tldr_page: str) -> str:
     """
     Render a manpage from a markdown formatted tldr-page.
@@ -271,7 +274,9 @@ def render_manpage(tldr_page: str) -> str:
     res = MANPAGE_HEADER.format(name=name, desc=info[0], info='\n'.join(info[1:]), examples=examples)
 
     try:
-        return run(['pandoc', '-', '-s', '-t', 'man', '-f', 'markdown-tex_math_dollars-smart'],
+        if PANDOC_LOCATION is None:
+            raise FileNotFoundError
+        return run([PANDOC_LOCATION, '-', '-s', '-t', 'man', '-f', 'markdown-tex_math_dollars-smart'],
                    input=res, stdout=PIPE, encoding="utf-8").stdout
     except FileNotFoundError:
         raise ExternalCommandNotFound('pandoc', PANDOC_MISSING_MESSAGE)
@@ -279,8 +284,10 @@ def render_manpage(tldr_page: str) -> str:
 
 def pandoc_exists() -> bool:
     """Check whether pandoc exists."""
+    if PANDOC_LOCATION is None:
+        return False
     try:
-        return run(['pandoc', '--version'], stdout=DEVNULL).returncode == 0
+        return run([PANDOC_LOCATION, '--version'], stdout=DEVNULL).returncode == 0
     except FileNotFoundError:
         return False
 
