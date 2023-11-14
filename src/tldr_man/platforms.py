@@ -20,7 +20,7 @@ from typing import Optional
 from click import Context
 
 
-TLDR_PLATFORMS = 'android linux macos osx sunos windows'.split()
+TLDR_PLATFORMS = 'android freebsd linux macos netbsd openbsd osx sunos windows'.split()
 
 
 def get_page_sections(ctx: Context) -> list[str]:
@@ -40,14 +40,12 @@ def get_page_sections(ctx: Context) -> list[str]:
 
 def get_current_platform() -> Optional[str]:
     """Get the correct tldr platform directory name from `sys.platform`."""
-    match sys.platform:
-        case 'darwin':
-            return 'osx'
-        case 'linux':
-            return 'linux'
-        case 'win32' | 'cygwin' | 'msys':
-            return 'windows'
-        case 'sunos5':
-            return 'sunos'
-        case _:
-            return None
+    platform = sys.platform
+    for platform_prefix in ['freebsd', 'linux', 'netbsd', 'openbsd', 'sunos']:
+        if platform.startswith(platform_prefix):
+            return platform_prefix
+    if platform == 'darwin':
+        return 'osx'
+    if platform in ['win32', 'cygwin', 'msys']:
+        return 'windows'
+    return None
