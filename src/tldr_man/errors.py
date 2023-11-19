@@ -15,7 +15,7 @@
 """Exceptions raised by the client."""
 
 from urllib.parse import quote as url_escape
-from typing import Optional, IO, AnyStr
+from typing import Optional, IO, Any
 
 from click import echo, get_current_context
 from click.exceptions import ClickException
@@ -28,7 +28,7 @@ class ColoredClickException(ClickException):
         super().__init__(message)
         self.ctx = get_current_context(silent=True)
 
-    def show(self, file: Optional[IO[AnyStr]] = None) -> None:
+    def show(self, file: Optional[IO[Any]] = None) -> None:
         if file is None:
             # noinspection PyProtectedMember
             from click._compat import get_text_stderr

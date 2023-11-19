@@ -23,7 +23,7 @@ from pathlib import Path
 from os import makedirs, getenv
 from shutil import rmtree, move, which
 from subprocess import run, PIPE, DEVNULL
-from typing import Optional, TypeVar
+from typing import Optional, TypeVar, overload
 from collections.abc import Iterable, Iterator, Hashable
 
 import requests
@@ -66,6 +66,12 @@ The tldr-pages cache needs to be generated before {style_command('tldr')} can be
   Run {style_command('tldr --update')} to generate the cache.
 """[1:-1]
 
+
+@overload
+def getenv_dir(key: str, default: None = None) -> Optional[Path]: ...
+
+@overload
+def getenv_dir(key: str, default: Path) -> Path: ...
 
 def getenv_dir(key: str, default: Optional[Path] = None) -> Optional[Path]:
     if value := getenv(key):
@@ -252,13 +258,13 @@ def render_manpage(tldr_page: str) -> str:
     name = lines.pop(0).lstrip('# ')  # Get the name of the command.
 
     # Get the information of the command.
-    info = []
+    info: list[str] = []
     while lines and ((valid_line := (line := lines.pop(0)).startswith('> ')) or not info):
         if not valid_line:
             continue
         info.append(line.removeprefix('> '))
 
-    examples = []
+    examples_list = []
     for line in lines:
         if not line:
             continue
@@ -266,10 +272,10 @@ def render_manpage(tldr_page: str) -> str:
         indicator, contents = line[0], line[1:].strip().replace(r'\\', r'\e').replace('*', r'\*')
         match indicator:
             case '-':
-                examples.append(f'\n**{contents}**\n')
+                examples_list.append(f'\n**{contents}**\n')
             case '`':
-                examples.append(f': {contents[:-1]}\n')
-    examples = re.sub(r'\{\{(.*?)}}', r'*\1*', ''.join(examples))
+                examples_list.append(f': {contents[:-1]}\n')
+    examples = re.sub(r'\{\{(.*?)}}', r'*\1*', ''.join(examples_list))
 
     res = MANPAGE_HEADER.format(name=name, desc=info[0], info='\n'.join(info[1:]), examples=examples)
 
