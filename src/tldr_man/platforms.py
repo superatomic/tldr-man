@@ -14,7 +14,7 @@
 
 """Handle platforms for the client."""
 
-import sys
+from sys import platform
 from typing import Optional
 
 from click import Context
@@ -40,7 +40,6 @@ def get_page_sections(ctx: Context) -> list[str]:
 
 def get_current_platform() -> Optional[str]:
     """Get the correct tldr platform directory name from `sys.platform`."""
-    platform = sys.platform
     for platform_prefix in ['freebsd', 'linux', 'netbsd', 'openbsd', 'sunos']:
         if platform.startswith(platform_prefix):
             return platform_prefix

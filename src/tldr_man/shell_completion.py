@@ -24,7 +24,7 @@ from tldr_man.platforms import get_page_sections
 
 @cache_dir_lock
 def page_shell_complete(ctx: Context, param: Parameter, incomplete: str) -> list[CompletionItem]:
-    if not CACHE_DIR.exists() or param.name is None: # the `param.name is None` check makes the type checker happy
+    if not CACHE_DIR.exists() or param.name is None:  # the `param.name is None` check makes the type checker happy
         return []
 
     locales: list[str] = get_locales(ctx)
