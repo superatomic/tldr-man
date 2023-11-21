@@ -22,8 +22,14 @@ from click import style
 HELP_COLORS = dict(help_headers_color='yellow', help_options_color='green')
 
 
-style_command = partial(style, fg='cyan', bold=True)
-style_error = partial(style, fg='red', bold=True)
-style_input = partial(style, fg='yellow')
-style_path = partial(style, fg='blue')
-style_url = partial(style, underline=True)
+_style: partial[partial[str]] = partial(partial, style)
+
+style_command = _style(fg='cyan', bold=True)
+style_error = _style(fg='red', bold=True)
+style_input = _style(fg='yellow')
+style_path = _style(fg='blue')
+style_url = _style(underline=True)
+
+style_create = _style(fg='green', bold=True)
+style_update = _style(fg='blue', bold=True)
+style_no_change = _style(bold=True)

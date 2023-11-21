@@ -27,10 +27,10 @@ from typing import Optional, TypeVar, overload
 from collections.abc import Iterable, Iterator, Hashable
 
 import requests
-from click import style, echo, secho, progressbar, format_filename
+from click import echo, progressbar, format_filename
 from filelock import FileLock
 
-from tldr_man.color import style_command, style_path, style_url
+from tldr_man.color import style_command, style_path, style_url, style_create, style_update, style_no_change
 from tldr_man.errors import Fail, NoPageCache, ExternalCommandNotFound, PageNotFound, eprint
 from tldr_man.temp_path import temp_file, temp_dir
 
@@ -120,7 +120,7 @@ def update_cache() -> None:
 
     ensure_cache_dir_update_safety()
 
-    secho('Updating tldr-pages cache...', fg='cyan')
+    echo('Updating tldr-pages cache...')
 
     created, updated, unchanged = 0, 0, 0
 
@@ -148,9 +148,9 @@ def update_cache() -> None:
                 )
 
                 # Create the label for the progress bars that are shown.
-                progressbar_label = (style(f"{language_directory_to_code(language_dir):5s}", fg='blue')
+                progressbar_label = (style_path(f"{language_directory_to_code(language_dir):5s}")
                                      + ' / '
-                                     + style(f'{sections_dir.name:7s}', fg='blue'))
+                                     + style_path(f'{sections_dir.name:7s}'))
 
                 # `render_manpage()` takes a significant amount of time to run.
                 # Due to the number of pages that need to be rendered,
@@ -209,9 +209,9 @@ def update_cache() -> None:
 
     # Display the details for the cache update:
     echo(', '.join([
-        style(f'{created} Added', fg='green', bold=True),
-        style(f'{updated} Updated', fg='blue', bold=True),
-        style(f'{unchanged} Unchanged', bold=True),
+        style_create(f'{created} Added'),
+        style_update(f'{updated} Updated'),
+        style_no_change(f'{unchanged} Unchanged'),
     ]))
 
 
