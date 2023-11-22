@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.5.1] - 2023-11-21
+
+### Fixed
+
+- Display accurate progress for progressbar when downloading ZIP archive ([`02f3e24`](https://github.com/superatomic/tldr-man/commit/02f3e24d9febe5c28da19fde99d30ebf4b6c455c))
+
 ## [1.5.0] - 2023-11-21
 
 ### Changed
@@ -125,6 +131,7 @@
 
 _First release._
 
+[1.5.1]: https://github.com/superatomic/tldr-man/compare/v1.5.0...v1.5.1
 [1.5.0]: https://github.com/superatomic/tldr-man/compare/v1.4.1...v1.5.0
 [1.4.1]: https://github.com/superatomic/tldr-man/compare/v1.4.0...v1.4.1
 [1.4.0]: https://github.com/superatomic/tldr-man/compare/v1.3.1...v1.4.0
