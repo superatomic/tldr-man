@@ -1,5 +1,27 @@
 # Changelog
 
+## [1.5.0] - 2023-11-21
+
+### Changed
+
+- Improve error message descriptions, formatting, and color ([`0b0f2f8`](https://github.com/superatomic/tldr-man/commit/0b0f2f84bf49cfd2f27bf8ea9507027ac6ab17ee), [`cfdfd34`](https://github.com/superatomic/tldr-man/commit/cfdfd344d0dd496fcfb639d670a705cf6639fce4))
+- Display directories first in the error message for when the cache contains non-cache files ([`1221945`](https://github.com/superatomic/tldr-man/commit/1221945da8de8801d539a5eb4312f8ebb1b0f929))
+- Suppress the usage of ANSI color when the environment variable `TERM=dumb` ([`d553712`](https://github.com/superatomic/tldr-man/commit/d553712d0fb585cc81897245d02dc9c3b9a32d5b))
+
+### Added
+
+- Add `freebsd`, `netbsd`, and `openbsd` platforms ([`ba4392f`](https://github.com/superatomic/tldr-man/commit/ba4392f82a5062ef8b55f7488afe07fc866816d1))
+- Display download progress for ZIP archive ([`cfdfd34`](https://github.com/superatomic/tldr-man/commit/cfdfd344d0dd496fcfb639d670a705cf6639fce4))
+- Use the environment variable `TLDR_MAN_ARCHIVE_URL` as the location to download the page archive from ([`cfdfd34`](https://github.com/superatomic/tldr-man/commit/cfdfd344d0dd496fcfb639d670a705cf6639fce4))
+
+### Removed
+
+- Remove prioritizing `--render` and `--update` over other subcommand options when multiple options are specified ([`b2503ce`](https://github.com/superatomic/tldr-man/commit/b2503ce7bc4523dc2dfdd43901ea5f8871a760cd))
+
+### Fixed
+
+- Lock cache directory while reading and writing to prevent race conditions ([`b487466`](https://github.com/superatomic/tldr-man/commit/b487466d9ce750ac1b3043d003c32171b11b6725))
+
 ## [1.4.1] - 2023-08-27
 
 ### Changed
@@ -103,6 +125,7 @@
 
 _First release._
 
+[1.5.0]: https://github.com/superatomic/tldr-man/compare/v1.4.1...v1.5.0
 [1.4.1]: https://github.com/superatomic/tldr-man/compare/v1.4.0...v1.4.1
 [1.4.0]: https://github.com/superatomic/tldr-man/compare/v1.3.1...v1.4.0
 [1.3.1]: https://github.com/superatomic/tldr-man/compare/v1.3.0...v1.3.1
