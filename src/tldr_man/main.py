@@ -142,13 +142,11 @@ def subcommand_manpath(locales: list[str], page_sections: list[str]) -> None:
 @option('-p', '--platform',
         metavar='PLATFORM',
         type=click.Choice(TLDR_PLATFORMS),
-        expose_value=False,
         is_eager=True,
         help='Override the preferred platform')
 @option('-L', '--language',
         metavar='LANGUAGE',
         type=str,
-        expose_value=False,
         is_eager=True,
         shell_complete=language_shell_complete,
         help='Specify a preferred language')
@@ -162,7 +160,7 @@ def subcommand_manpath(locales: list[str], page_sections: list[str]) -> None:
 @help_option('-h', '--help',
              help='Show this message and exit')
 @require_tldr_cache
-def cli(locales: list[str], page_sections: list[str], page: list[str]) -> None:
+def cli(locales: list[str], page_sections: list[str], /, page: list[str], **_: Any) -> None:
     """TLDR client that displays tldr-pages as manpages"""
     page_name = '-'.join(page).strip().lower()
     page_file = pages.find_page(page_name, locales, page_sections)
