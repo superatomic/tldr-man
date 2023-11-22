@@ -19,6 +19,7 @@ import shlex
 import zipfile
 from concurrent.futures import ThreadPoolExecutor
 from contextlib import suppress, contextmanager
+from math import ceil
 from pathlib import Path
 from os import makedirs, getenv
 from shutil import rmtree, move, which
@@ -38,6 +39,7 @@ from tldr_man.temp_path import temp_file, temp_dir
 CACHE_DIR_NAME = 'tldr-man'
 
 ZIP_ARCHIVE_URL = getenv('TLDR_MAN_ARCHIVE_URL', "https://tldr.sh/assets/tldr.zip")
+ZIP_ARCHIVE_CHUNK_SIZE = 8192
 
 MANPAGE_SECTION = '1'
 
@@ -98,12 +100,12 @@ def pages_archive(url: str = ZIP_ARCHIVE_URL) -> Iterator[zipfile.Path]:
             with requests.get(url, stream=True, timeout=10) as r:
                 r.raise_for_status()
                 try:
-                    length = int(r.headers['Content-Length'])
+                    length = ceil(int(r.headers['Content-Length']) / ZIP_ARCHIVE_CHUNK_SIZE)
                 except (KeyError, ValueError):  # KeyError if lookup failed and ValueError if `int()` failed.
                     length = None
                 with (open(zip_file, 'wb') as file,
                       progressbar(
-                          r.iter_content(chunk_size=8192),
+                          r.iter_content(chunk_size=ZIP_ARCHIVE_CHUNK_SIZE),
                           label=style_task("Downloading ZIP"),
                           length=length,
                       ) as chunks):
