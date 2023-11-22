@@ -28,6 +28,7 @@ style_command = _style(fg='cyan', bold=True)
 style_error = _style(fg='red', bold=True)
 style_input = _style(fg='yellow')
 style_path = _style(fg='blue')
+style_task = _style(fg='cyan')
 style_url = _style(underline=True)
 
 style_create = _style(fg='green', bold=True)

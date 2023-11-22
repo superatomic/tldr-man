@@ -18,7 +18,7 @@ import re
 import shlex
 import zipfile
 from concurrent.futures import ThreadPoolExecutor
-from contextlib import suppress
+from contextlib import suppress, contextmanager
 from pathlib import Path
 from os import makedirs, getenv
 from shutil import rmtree, move, which
@@ -29,14 +29,15 @@ from collections.abc import Iterable, Iterator, Hashable
 import requests
 from click import echo, progressbar, format_filename
 from filelock import FileLock
+from requests.exceptions import ConnectionError, HTTPError, InvalidSchema, InvalidURL, MissingSchema, Timeout
 
-from tldr_man.color import style_command, style_path, style_url, style_create, style_update, style_no_change
-from tldr_man.errors import Fail, NoPageCache, ExternalCommandNotFound, PageNotFound, eprint
+from tldr_man.color import style_command, style_path, style_task, style_url, style_create, style_update, style_no_change
+from tldr_man.errors import Fail, NoPageCache, ExternalCommandNotFound, PageNotFound
 from tldr_man.temp_path import temp_file, temp_dir
 
 CACHE_DIR_NAME = 'tldr-man'
 
-ZIP_ARCHIVE_URL = "https://tldr.sh/assets/tldr.zip"
+ZIP_ARCHIVE_URL = getenv('TLDR_MAN_ARCHIVE_URL', "https://tldr.sh/assets/tldr.zip")
 
 MANPAGE_SECTION = '1'
 
@@ -89,20 +90,38 @@ CACHE_DIR: Path = get_cache_dir()
 cache_dir_lock = FileLock(CACHE_DIR.parent / f'.{CACHE_DIR.name}.lock', timeout=2)
 
 
-def download_archive(location: Path, url: str = ZIP_ARCHIVE_URL) -> None:
-    """Downloads the current tldr-pages zip archive into a specific location."""
-
-    try:
-        r = requests.get(url, timeout=10)
-    except requests.ConnectionError:
-        raise Fail(f"Could not make connection to {style_url(url)}")
-    except requests.Timeout:
-        raise Fail(f"Request to {style_url(url)} timed out")
-    except requests.RequestException:
-        eprint(f"The following error occurred when trying to access {style_url(url)}:")
-        raise
-    else:
-        location.write_bytes(r.content)
+@contextmanager
+def pages_archive(url: str = ZIP_ARCHIVE_URL) -> Iterator[zipfile.Path]:
+    """Downloads the current tldr-pages zip archive and yields it."""
+    with temp_file('tldr.zip') as zip_file:
+        try:
+            with requests.get(url, stream=True, timeout=10) as r:
+                r.raise_for_status()
+                try:
+                    length = int(r.headers['Content-Length'])
+                except (KeyError, ValueError):  # KeyError if lookup failed and ValueError if `int()` failed.
+                    length = None
+                with (open(zip_file, 'wb') as file,
+                      progressbar(
+                          r.iter_content(chunk_size=8192),
+                          label=style_task("Downloading ZIP"),
+                          length=length,
+                      ) as chunks):
+                    for chunk in chunks:
+                        file.write(chunk)
+            yield zipfile.Path(zip_file)
+        except (InvalidURL, InvalidSchema):
+            raise Fail(f"Invalid URL '{style_url(url)}'")
+        except MissingSchema:
+            raise Fail(f"Invalid URL '{style_url(url)}'. Perhaps you meant {style_url('https://' + url)}?")
+        except ConnectionError:
+            raise Fail(f"Could not connect to {style_url(url)}")
+        except Timeout:
+            raise Fail(f"Request to {style_url(url)} timed out")
+        except HTTPError:
+            raise Fail(f"Request to {style_url(url)}: {r.status_code} {r.reason}")
+        except zipfile.BadZipFile:
+            raise Fail(f"Got a bad ZIP file from {style_url(ZIP_ARCHIVE_URL)}")
 
 
 AnyPath = TypeVar('AnyPath', Path, zipfile.Path)
@@ -124,15 +143,7 @@ def update_cache() -> None:
 
     created, updated, unchanged = 0, 0, 0
 
-    with temp_file('tldr.zip') as zip_archive_location, temp_dir('tldr-man') as temp_cache_dir:
-
-        # Get the zip file
-        download_archive(zip_archive_location)
-        try:
-            zip_path = zipfile.Path(zip_archive_location)
-        except zipfile.BadZipFile:
-            raise Fail(f"Got a bad zipfile from {style_url(ZIP_ARCHIVE_URL)}")
-
+    with pages_archive() as zip_path, temp_dir('tldr-man') as temp_cache_dir:
         # Iterate through each language and section in the zip file.
         for language_dir in iter_dirs(zip_path):
             for sections_dir in iter_dirs(language_dir):

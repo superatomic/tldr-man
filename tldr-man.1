@@ -153,6 +153,16 @@ If none of these environment variables are set or if no valid pages exist for an
 this defaults back to
 .BR en .
 .TP
+.BR TLDR_MAN_ARCHIVE_URL
+The URL to download pages from when running the
+.B tldr \-\-update
+command. If this variable is not set, the default
+.UR https://tldr.sh/assets/tldr.zip
+official archive URL
+.UE
+is used. The file located at the provided URL must be a well\-formed ZIP file with contents which match the directory
+structure specified in the TLDR\-Pages Client Specification.
+.TP
 .BR TLDR_MAN_CACHE_DIR
 The location of the page cache directory. This directory is created by the
 .B tldr \-\-update
