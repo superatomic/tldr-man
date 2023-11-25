@@ -68,7 +68,3 @@ class ExternalCommandNotFound(ColoredClickException):
 
     def format_message(self) -> str:
         return f"Couldn't find the {style_command(self.command_name)} command.\n" + self.message
-
-
-def eprint(message: str) -> None:
-    echo(style_error(message), err=True)
