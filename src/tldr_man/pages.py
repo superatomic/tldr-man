@@ -148,6 +148,8 @@ def update_cache() -> None:
     with pages_archive() as zip_path, temp_dir('tldr-man') as temp_cache_dir:
         # Iterate through each language and section in the zip file.
         for language_dir in iter_dirs(zip_path):
+            if language_dir.name == 'pages' and (zip_path / 'pages.en').is_dir():
+                continue  # Skip the duplicate legacy English directory.
             for sections_dir in iter_dirs(language_dir):
                 # Get the full path to the directory where all manpages for this language and section will be extracted.
                 res_dir = temp_cache_dir / language_dir.name / sections_dir.name / ('man' + MANPAGE_SECTION)

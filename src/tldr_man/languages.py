@@ -82,7 +82,7 @@ def _language_code_as_parts(language_code: str) -> tuple[str, str]:
 def get_language_directory(language_code: str) -> str:
     """Get the name of the directory for a language code."""
     language, region = _language_code_as_parts(language_code)
-    if language == 'en':
+    if language == 'en' and not (CACHE_DIR / 'pages.en').is_dir():
         return 'pages'
     else:
         full_locale = f'pages.{language}_{region}'
