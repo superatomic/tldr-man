@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.2] - 2024-03-29
+
+### Fixed
+
+- Update archive url to new location ([tldr-pages/tldr v2.2](https://github.com/tldr-pages/tldr/releases/tag/v2.2), [`747cf41`](https://github.com/superatomic/tldr-man/commit/747cf4113cc844880d86b373b1abcee28094d5ab))
+- Use a nicer error message when `pandoc` fails ([`26aa2cd`](https://github.com/superatomic/tldr-man/commit/26aa2cdd3546bd5ed02c06886ef573662853d6e3))
+
 ## [1.5.1] - 2023-11-21
 
 ### Fixed
@@ -131,6 +138,7 @@
 
 _First release._
 
+[1.5.2]: https://github.com/superatomic/tldr-man/compare/v1.5.1...v1.5.2
 [1.5.1]: https://github.com/superatomic/tldr-man/compare/v1.5.0...v1.5.1
 [1.5.0]: https://github.com/superatomic/tldr-man/compare/v1.4.1...v1.5.0
 [1.4.1]: https://github.com/superatomic/tldr-man/compare/v1.4.0...v1.4.1
