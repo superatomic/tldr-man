@@ -38,7 +38,7 @@ from tldr_man.temp_path import temp_file, temp_dir
 
 CACHE_DIR_NAME = 'tldr-man'
 
-ZIP_ARCHIVE_URL = getenv('TLDR_MAN_ARCHIVE_URL', "https://tldr.sh/assets/tldr.zip")
+ZIP_ARCHIVE_URL = getenv('TLDR_MAN_ARCHIVE_URL', "https://github.com/tldr-pages/tldr/releases/latest/download/tldr.zip")
 ZIP_ARCHIVE_CHUNK_SIZE = 8192
 
 MANPAGE_SECTION = '1'
