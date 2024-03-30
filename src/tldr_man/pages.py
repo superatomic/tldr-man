@@ -297,8 +297,11 @@ def render_manpage(tldr_page: str) -> str:
     try:
         if PANDOC_LOCATION is None:
             raise FileNotFoundError
-        return run([PANDOC_LOCATION, '-', '-s', '-t', 'man', '-f', 'markdown-tex_math_dollars-smart'],
-                   input=res, stdout=PIPE, encoding="utf-8").stdout
+        pandoc = run([PANDOC_LOCATION, '-', '-s', '-t', 'man', '-f', 'markdown-tex_math_dollars-smart'],
+                     input=res, stdout=PIPE, encoding="utf-8")
+        if pandoc.returncode:
+            raise Fail(f"Command 'pandoc' returned non-zero exit status {pandoc.returncode}")
+        return pandoc.stdout
     except FileNotFoundError:
         raise ExternalCommandNotFound('pandoc', PANDOC_MISSING_MESSAGE)
 
